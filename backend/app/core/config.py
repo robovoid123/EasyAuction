@@ -38,11 +38,13 @@ class Settings(BaseSettings):
             user=values.get("POSTGRES_USER"),
             password=values.get("POSTGRES_PASSWORD"),
             host=values.get("POSTGRES_SERVER"),
+            port=values.get("POSTGRES_PORT"),
             path=f"/{values.get('POSTGRES_DB') or ''}",
         )
 
     class Config:
         case_sensitive = True
+        env_file = ".env"
 
 
 settings = Settings()
