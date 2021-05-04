@@ -16,7 +16,7 @@ class CategoryList(str, enum.Enum):
     pass
 
 
-class Cateogry(Base):
+class Category(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
     category = sa.Column(sa.Enum(CategoryList))
 
@@ -38,7 +38,7 @@ class Product(Base):
     inventory_id = sa.Column(sa.Integer, sa.ForeignKey('inventory.id'))
 
     owner = relationship("User", back_populates='products')
-    categories = relationship("ProductCategory", back_populates='products')
+    categories = relationship("Category", back_populates='products')
     inventory = relationship("Inventory", back_populates='product')
 
 
