@@ -1,3 +1,4 @@
+from app.db.base import Base
 from app.core.config import settings
 from logging.config import fileConfig
 import logging
@@ -7,11 +8,6 @@ from sqlalchemy import engine_from_config, create_engine, pool
 from psycopg2 import DatabaseError
 
 from alembic import context
-
-import pathlib
-import sys
-
-sys.path.append(str(pathlib.Path(__file__).resolve().parents[3]))
 
 
 # this is the Alembic Config object, which provides
@@ -27,7 +23,7 @@ logger = logging.getLogger("alembic.env")
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -42,7 +38,9 @@ def run_migrations_offline():
     if os.environ.get("TESTING"):
         raise DatabaseError(
             "Running testing migrations offline currently not permitted.")
-    context.configure(url=str(settings.SQLALCHEMY_DATABASE_URI))
+    context.configure(url=str(settings.SQLALCHEMY_DATABASE_URI),
+                      target_metadata=target_metadata,
+                      literal_binds=True, compare_type=True)
     with context.begin_transaction():
         context.run_migrations()
 
@@ -77,7 +75,8 @@ def run_migrations_online():
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
-            target_metadata=None
+            target_metadata=target_metadata,
+            compare_type=True
         )
         with context.begin_transaction():
             context.run_migrations()

@@ -1,15 +1,11 @@
-from typing import Callable, Type
-from databases import Database
-from fastapi import Depends
-from starlette.requests import Request
-from app.db.repositories.base import BaseRepository
+from typing import Generator
+
+from app.db.session import SessionLocal
 
 
-def get_database(request: Request) -> Database:
-    return request.app.state._db
-
-
-def get_repository(Repo_type: Type[BaseRepository]) -> Callable:
-    def get_repo(db: Database = Depends(get_database)) -> Type[BaseRepository]:
-        return Repo_type(db)
-    return get_repo
+def get_db() -> Generator:
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
+        db.close()
