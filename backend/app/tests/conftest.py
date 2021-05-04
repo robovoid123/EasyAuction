@@ -18,6 +18,7 @@ def apply_migrations():
     alembic.command.upgrade(config, "head")
     yield
     alembic.command.downgrade(config, "base")
+
 # Create a new application for testing
 
 
@@ -25,12 +26,14 @@ def apply_migrations():
 def app(apply_migrations: None) -> FastAPI:
     from app.api.server import app
     return app
+
 # Grab a reference to our database when needed
 
 
 @pytest.fixture
 def db(app: FastAPI) -> Database:
     return app.state._db
+
 # Make requests in our tests
 
 
