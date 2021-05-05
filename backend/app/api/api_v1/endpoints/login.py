@@ -15,6 +15,7 @@ from app.core.security import get_password_hash
 
 router = APIRouter()
 
+
 @router.post("/login/access-token", response_model=schemas.Token)
 def login_access_token(
     db: Session = Depends(database.get_db), form_data: OAuth2PasswordRequestForm = Depends()
