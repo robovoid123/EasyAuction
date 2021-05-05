@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.crud import user as crud_user
-from app.api.dependencies import database
+from app.api.dependencies import database, auth
 
 router = APIRouter()
 
@@ -48,13 +48,14 @@ def get_user(
         )
     return user
 
+
 @router.get("/", response_model=List[schemas.User])
 def read_users(
     db: Session = Depends(database.get_db),
     skip: int = 0,
     limit: int = 100,
     current_user: models.user.User = Depends(
-        database.get_current_active_user),
+        auth.get_current_active_user),
 ) -> Any:
     """
     Retrieve users.
@@ -62,16 +63,18 @@ def read_users(
     users = crud_user.user.get_multi(db, skip=skip, limit=limit)
     return users
 
+
 @router.get("/me", response_model=schemas.User)
 def read_user_me(
     db: Session = Depends(database.get_db),
     current_user: models.user.User = Depends(
-        database.get_current_active_user),
+        auth.get_current_active_user),
 ) -> Any:
     """
     Get current user.
     """
     return current_user
+
 
 @router.put("/me", response_model=schemas.User)
 def update_user_me(
@@ -81,7 +84,7 @@ def update_user_me(
     full_name: str = Body(None),
     email: EmailStr = Body(None),
     current_user: models.user.User = Depends(
-        database.get_current_active_user),
+        auth.get_current_active_user),
 ) -> Any:
     """
     Update own user.

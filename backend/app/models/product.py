@@ -35,10 +35,10 @@ class Product(Base):
     updated_at = sa.Column(sa.DateTime(timezone=True),
                            server_default=sa.func.now(), onupdate=sa.func.now())
 
-    # owner_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+    owner_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
     inventory_id = sa.Column(sa.Integer, sa.ForeignKey('inventory.id'))
 
-    # owner = relationship("User", back_populates='products')
+    owner = relationship("User")
     categories = relationship("Category", back_populates='products')
     inventory = relationship("Inventory", back_populates='product')
 

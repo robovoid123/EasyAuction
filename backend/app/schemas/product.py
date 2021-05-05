@@ -9,13 +9,13 @@ class ProductBase(BaseModel):
     name: Optional[str]
     description: Optional[str]
     condition: Optional[Conditions]
-    # owner_id: Optional[int]
+    owner_id: Optional[int]
     inventory_id: Optional[int]
 
 
 class ProductCreate(ProductBase):
     name: str
-    # owner_id: int
+    owner_id: int
     inventory_id: int
 
 
