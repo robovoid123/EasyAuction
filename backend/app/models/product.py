@@ -13,16 +13,17 @@ class Conditions(str, enum.Enum):
 
 
 class CategoryList(str, enum.Enum):
-    pass
+    ELECTRONIC_DEVICES = 'electornic_devices'
+    BOOKS = 'books'
 
 
 class Category(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
-    category = sa.Column(sa.Enum(CategoryList))
+    category = sa.Column(sa.String)
 
     product_id = sa.Column(sa.Integer, sa.ForeignKey('product.id'))
 
-    # products = relationship("Product", back_populates='category')
+    products = relationship("Product", back_populates='categories')
 
 
 class Product(Base):
@@ -37,7 +38,7 @@ class Product(Base):
     # owner_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
     inventory_id = sa.Column(sa.Integer, sa.ForeignKey('inventory.id'))
 
-    owner = relationship("User", back_populates='products')
+    # owner = relationship("User", back_populates='products')
     categories = relationship("Category", back_populates='products')
     inventory = relationship("Inventory", back_populates='product')
 
