@@ -44,23 +44,12 @@ def update_product(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="only owner can update")
 
-    if product_in.quantity is not None:
-        product.update_inventory(db=db,
-                                 product_db=old_product,
-                                 quantity=product_in.quantity,
-                                 )
-
-    if product_in.categories:
-        product.add_categories(db=db,
-                               categories=product_in.categories,
-                               product_id=old_product.id)
-
-    product_obj = ProductUpdate(**jsonable_encoder(product_in))
-    updated_product = product.update(db=db,
-                                     db_obj=old_product,
-                                     obj_in=product_obj)
-
-    return updated_product
+    update_obj = ProductUpdate(**jsonable_encoder(product_in))
+    return product.update_all(db=db,
+                              db_obj=old_product,
+                              obj_in=update_obj,
+                              quantity=product_in.quantity,
+                              categories=product_in.categories)
 
 
 @router.post("/", response_model=ProductResponse)
@@ -69,16 +58,15 @@ def create_product(
         product_in: ProductRequest,
         db: Session = Depends(database.get_db),
         current_user: User = Depends(auth.get_current_active_user)):
-    new_inventory = product.create_inventory(db=db,
-                                             quantity=product_in.quantity)
-    product_obj = ProductCreate(**jsonable_encoder(product_in),
-                                inventory_id=new_inventory.id,
-                                owner_id=current_user.id)
-    new_product = product.create(db=db,
-                                 obj_in=product_obj)
-    product.add_categories(db=db,
-                           categories=product_in.categories,
-                           product_id=new_product.id)
+    product_obj = ProductCreate(
+        **jsonable_encoder(product_in), owner_id=current_user.id)
+
+    new_product = product.create_new(
+        db=db,
+        obj_in=product_obj,
+        quantity=product_in.quantity,
+        categories=product_in.categories
+    )
 
     return new_product
 

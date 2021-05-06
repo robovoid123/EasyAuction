@@ -8,7 +8,51 @@ from app.models.product import Product, Inventory, Category, CategoryList
 
 
 class CRUDProduct(CRUDBase[Product, cp.ProductCreate, cp.ProductUpdate]):
-    def create_inventory(self, *, db: Session, quantity: int, commit=True):
+
+    def create_new(self,
+                   *,
+                   db: Session,
+                   obj_in: cp.ProductCreate,
+                   quantity: int,
+                   categories: List[CategoryList]) -> Product:
+
+        new_product = product.create(db=db,
+                                     obj_in=obj_in,
+                                     commit=False)
+        new_product = product.add_inventory(
+            db=db, db_obj=new_product, quantity=quantity, commit=False)
+        new_product = product.add_categories(db=db,
+                                             categories=categories,
+                                             db_obj=new_product, commit=False)
+        db.commit()
+        db.refresh(new_product)
+        return new_product
+
+    def update_all(self,
+                   *,
+                   db: Session,
+                   db_obj: Product,
+                   obj_in: cp.ProductUpdate,
+                   quantity: int,
+                   categories: List[CategoryList]) -> Product:
+
+        if quantity is not None:
+            product.update_inventory(db=db,
+                                     db_obj=db_obj,
+                                     quantity=quantity,
+                                     )
+        if categories:
+            product.add_categories(db=db,
+                                   db_obj=db_obj,
+                                   categories=categories)
+
+        return product.update(db=db, db_obj=db_obj, obj_in=obj_in)
+
+    def create_inventory(self,
+                         *,
+                         db: Session,
+                         quantity: int,
+                         commit=True) -> Inventory:
         restocked_at = datetime.now()
         inventory = Inventory(quantity=quantity, restocked_at=restocked_at)
         db.add(inventory)
@@ -20,51 +64,59 @@ class CRUDProduct(CRUDBase[Product, cp.ProductCreate, cp.ProductUpdate]):
     def update_inventory(self,
                          *,
                          db: Session,
-                         product_db: Product,
+                         db_obj: Product,
                          quantity: int,
                          commit=True
-                         ):
+                         ) -> Product:
 
-        product_db.inventory.quantity = quantity
+        db_obj.inventory.quantity = quantity
         if commit:
             db.commit()
-            db.refresh(product_db)
-        return product_db.inventory
+            db.refresh(db_obj)
+        return db_obj
+
+    def add_inventory(self,
+                      db: Session,
+                      db_obj: Product,
+                      quantity: int,
+                      commit=True) -> Product:
+        new_inventory = self.create_inventory(db=db, quantity=quantity, commit=commit)
+        db_obj.inventory = new_inventory
+        return db_obj
 
     def add_category(
             self,
             *,
             db: Session,
+            db_obj: Product,
             category: CategoryList,
-            product_id: int,
-            commit=True):
+            commit=True) -> Product:
 
-        category = Category(category=category,
-                            product_id=product_id)
-        db.add(category)
+        category = Category(category=category)
+        db_obj.categories.append(category)
         if commit:
             db.commit()
-            db.refresh(category)
-        return category
+            db.refresh(db_obj)
+        return db_obj
 
     def add_categories(
             self,
             *,
             db: Session,
+            db_obj: Product,
             categories: List[CategoryList],
-            product_id: int,
             commit=True):
 
-        def add_cat(category):
-            return self.add_category(db=db,
-                                     category=category,
-                                     product_id=product_id,
-                                     commit=False)
-
-        categories = [add_cat(category) for category in categories]
+        for category in categories:
+            db_obj = self.add_category(db=db,
+                                       category=category,
+                                       db_obj=db_obj,
+                                       commit=False)
+        db.add(db_obj)
         if commit:
             db.commit()
-        return categories
+            db.refresh(db_obj)
+        return db_obj
 
 
 product = CRUDProduct(Product)

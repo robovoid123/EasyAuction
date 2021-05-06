@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 import enum
 from datetime import datetime
 
@@ -17,21 +18,20 @@ class Auction:
                  product,
                  starting_bid,
                  bid_cap,
-                 starting_date=None,
                  strategy=AuctionType.ENGLISH,
                  ending_date):
 
         self.id = uuid.uuid1()
-        self._starting_bid = starting_bid
+        self._starting_bid_amount = Decimal(starting_bid)
         self._bid_cap = bid_cap
         self._ending_date = ending_date
-        self._starting_date = starting_date or datetime.now()
+        self._strategy = strategy_factory(strategy)
 
         self._state = AuctionState.CREATED
 
+        self._starting_date = None
         self._current_highest_bid = None
         self._current_winner = None
-        self._strategy = strategy_factory(strategy)
 
         self._final_winner = None
         self._winning_bid_amount = None
@@ -42,8 +42,6 @@ class Auction:
             self.end()
         elif self._state is AuctionState.CREATED:
             print("auction has not started")
-        elif not self._current_highest_bid and self._state is AuctionState.ONGOING:
-            self.set_current_winning_bid(bid)
         elif self._state is AuctionState.ONGOING:
             self._strategy(self, bid)
 
@@ -55,6 +53,10 @@ class Auction:
     def current_highest_bid(self):
         return self._current_highest_bid
 
+    @property
+    def starting_bid_amount(self):
+        return self._starting_bid_amount
+
     def set_current_winning_bid(self, bid):
         self._current_highest_bid = bid
         self._current_winner = bid.bidder
@@ -63,6 +65,9 @@ class Auction:
         return self._ending_date < datetime.now()
 
     def start(self):
+        # record exact time start was run
+        self._starting_date = datetime.now()
+
         if self._state is AuctionState.ONGOING:
             print("auction already started")
         elif self._state is AuctionState.ENDED:

@@ -7,7 +7,12 @@ class AuctionType(str, enum.Enum):
 
 
 def english_auction(auction, bid):
-    if bid.amount > auction.current_highest_bid.amount:
+    if not auction.current_highest_bid:
+        if bid.amount > auction.starting_bid_amount:
+            auction.set_current_winning_bid(bid)
+        else:
+            print("bid must be higer than starting bid")
+    elif bid.amount > auction.current_highest_bid.amount:
         auction.set_current_winning_bid(bid)
     else:
         print('bid too low')
