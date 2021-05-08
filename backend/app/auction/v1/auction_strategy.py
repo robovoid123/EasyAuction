@@ -6,14 +6,14 @@ class AuctionType(str, enum.Enum):
     DUTCH = 'dutch'
 
 
-def english_auction(auction, bid):
+def english_auction(auction, amount, bidder):
     if not auction.current_highest_bid:
-        if bid.amount > auction.starting_bid_amount:
-            auction.set_current_winning_bid(bid)
+        if amount > auction.starting_bid_amount:
+            auction.set_current_winning_bid(amount, bidder)
         else:
             print("bid must be higer than starting bid")
-    elif bid.amount > auction.current_highest_bid.amount:
-        auction.set_current_winning_bid(bid)
+    elif amount > auction.current_highest_bid.amount:
+        auction.set_current_winning_bid(amount, bidder)
     else:
         print('bid too low')
 

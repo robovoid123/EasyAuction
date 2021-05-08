@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     POSTGRES_PORT: str
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
 
+    REDIS_HOST: str
+    REDIS_PORT: str
+
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):

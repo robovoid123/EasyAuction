@@ -7,7 +7,10 @@ class Bid:
         self.bidder = user_id
         self.auction = auction
 
-        self.auction.bid_in_auction(self)
+        self.auction.bid_in_auction(self.amount, self.bidder)
 
     def __repr__(self):
         return f'Bid(amount={self.amount}, bidder={self.bidder})'
+
+    def store_in_db(self):
+        pass

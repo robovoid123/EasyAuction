@@ -21,7 +21,7 @@ class Category(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
     category = sa.Column(sa.String)
 
-    product_id = sa.Column(sa.Integer, sa.ForeignKey('product.id'))
+    product_id = sa.Column(sa.ForeignKey('product.id'))
 
     products = relationship("Product", back_populates='categories')
 
@@ -35,8 +35,8 @@ class Product(Base):
     updated_at = sa.Column(sa.DateTime(timezone=True),
                            server_default=sa.func.now(), onupdate=sa.func.now())
 
-    owner_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
-    inventory_id = sa.Column(sa.Integer, sa.ForeignKey('inventory.id'))
+    owner_id = sa.Column(sa.ForeignKey('user.id'))
+    inventory_id = sa.Column(sa.ForeignKey('inventory.id'))
 
     owner = relationship("User")
     categories = relationship("Category", back_populates='products')

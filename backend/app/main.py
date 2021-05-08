@@ -3,6 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.api_v1.api import router
 from app.core.config import settings
+from app.schedule import sched
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -19,6 +20,11 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+
+@app.on_event("startup")
+async def startup():
+    sched.start()
 
 
 app.include_router(router, prefix=settings.API_V1_STR)
