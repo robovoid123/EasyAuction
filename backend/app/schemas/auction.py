@@ -46,9 +46,22 @@ class AuctionSessionCreate(AuctionSessionBase):
     auction_id: int
 
 
+class AuctionSessionUpdate(AuctionSessionBase):
+    pass
+
+
 class BidBase(BaseModel):
     amount: Optional[float]
     bidder_id: Optional[int]
+
+
+class BidCreate(BidBase):
+    amount: float
+    bidder_id: int
+
+
+class BidUpdate(BidBase):
+    pass
 
 
 class BidInDB(BidBase):

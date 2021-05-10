@@ -11,7 +11,8 @@ from app.schemas.auction import (AuctionCreate,
                                  AuctionUpdate,
                                  AuctionInDB,
                                  BidInDB)
-from app.crud.auction import auction as ac
+
+from app.auction.auction_system import auction_system
 
 router = APIRouter()
 
@@ -24,9 +25,7 @@ def create_auction(
     auction_in: AuctionCreate
 ):
 
-    auction = ac.create(db=db, obj_in=auction_in)
-
-    return auction
+    return auction_system.create_auction(db, auction_in)
 
 
 @router.get('/', response_model=List[AuctionInDB])
@@ -35,10 +34,10 @@ def get_auctions(*,
                  skip: int = 0,
                  limit: int = 5):
 
-    return ac.get_multi(db=db, skip=skip, limit=limit)
+    return auction_system.get_multi(db, skip=skip, limit=limit)
 
 
-@router.post('/{id}/start', response_model=AuctionInDB)
+@router.post('/{id}/start')
 def start_auction(id,
                   *,
                   db: Session = Depends(get_db),
@@ -46,7 +45,7 @@ def start_auction(id,
                   current_user=Depends(get_current_active_user)
                   ):
 
-    auction = ac.get(db=db, id=id)
+    auction = auction_system.get_auction(db, id)
 
     if not auction:
 
@@ -55,13 +54,13 @@ def start_auction(id,
             detail='auction not found'
         )
 
-    if auction.owner_id != current_user.id:
+    if auction.owner.id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='only auction owner can do this action'
         )
 
-    return ac.start_auction(db, id, starting_date)
+    return auction.start(starting_date=starting_date)
 
 
 @router.post('/{id}/end', response_model=AuctionInDB)
@@ -70,7 +69,7 @@ def end_auction(id,
                 db: Session = Depends(get_db),
                 current_user=Depends(get_current_active_user)):
 
-    auction = ac.get(db=db, id=id)
+    auction = auction_system.get_auction(db, id)
 
     if not auction:
 
@@ -79,13 +78,13 @@ def end_auction(id,
             detail='auction not found'
         )
 
-    if auction.owner_id != current_user.id:
+    if auction.owner.id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='only auction owner can do this action'
         )
 
-    return ac.end_auction(db)
+    return auction.end()
 
 
 @router.post('/{id}/bids', response_model=BidInDB)
@@ -95,7 +94,7 @@ def bid_in_auction(id,
                    amount: int = Body(...),
                    current_user=Depends(get_current_active_user)):
 
-    auction = ac.get(db=db, id=id)
+    auction = auction_system.get_auction(db, id)
 
     if not auction:
 
@@ -103,8 +102,7 @@ def bid_in_auction(id,
             status_code=status.HTTP_404_NOT_FOUND,
             detail='auction not found'
         )
-
-    return ac.bid(db, id, amount, current_user.id)
+    return auction.bid(amount, current_user.id)
 
 
 @router.get('/{id}', response_model=AuctionInDB)
@@ -112,7 +110,7 @@ def get_auction(id,
                 *,
                 db: Session = Depends(get_db)):
 
-    auction = ac.get(db=db, id=id)
+    auction = auction_system.get_auction(db, id)
 
     if not auction:
 
@@ -121,7 +119,7 @@ def get_auction(id,
             detail='auction not found'
         )
 
-    return auction
+    return auction.get()
 
 
 @router.put('/{id}', response_model=AuctionInDB)
@@ -132,7 +130,7 @@ def update_auction(id,
                    auction_in: AuctionUpdate,
                    end_auction: bool = False):
 
-    auction = ac.get(db=db, id=id)
+    auction = auction_system.get_auction(db, id)
 
     if not auction:
         raise HTTPException(
@@ -140,14 +138,14 @@ def update_auction(id,
             detail='auction not found'
         )
 
-    if auction.owner_id != current_user.id:
+    if auction.owner.id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='only auction owner can do this action'
         )
 
     if end_auction:
-        ac.end_auction(db)
+        auction.end()
 
     if auction.auction_session and\
             not auction.auction_session.status == AuctionState.ONGOING:
@@ -158,4 +156,4 @@ def update_auction(id,
              either end or pause the auction"""
         )
 
-    return ac.update(db, db_obj=auction, obj_in=auction_in)
+    return auction.update(auction_in)

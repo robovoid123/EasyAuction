@@ -31,7 +31,7 @@ class Auction(Base):
     product_id = sa.Column(sa.ForeignKey('product.id'))
     winner_id = sa.Column(sa.ForeignKey('user.id'))
 
-    products = relationship("Product")
+    product = relationship("Product")
     owner = relationship("User", foreign_keys=[owner_id])
     winner = relationship("User", foreign_keys=[winner_id])
     auction_session = relationship(
