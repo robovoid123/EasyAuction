@@ -5,11 +5,12 @@ from fastapi.encoders import jsonable_encoder
 from app.api.dependencies import database, auth
 
 from app.models.user import User
-from app.crud.product import product
 from app.schemas.product import (ProductRequest,
                                  ProductResponse,
                                  ProductCreate,
                                  ProductUpdate)
+
+from app.easy_auction.product.product_manager import product_manager
 
 router = APIRouter()
 
@@ -24,14 +25,9 @@ def create_product(*,
         **jsonable_encoder(product_in),
         owner_id=current_user.id)
 
-    new_product = product.create_new(
-        db=db,
-        obj_in=product_obj,
-        quantity=product_in.quantity,
-        categories=product_in.categories
-    )
-
-    return new_product
+    return product_manager.create_product(db, product_obj,
+                                          quantity=product_in.quantity,
+                                          categories=product_in.categories)
 
 
 @router.get("/")
@@ -40,7 +36,7 @@ def get_products(*,
                  limit=5,
                  db: Session = Depends(database.get_db)):
 
-    return product.get_multi(db=db, skip=skip, limit=limit)
+    return product_manager.get_multi(db, skip=skip, limit=limit)
 
 
 @router.get("/{id}", response_model=ProductResponse)
@@ -48,15 +44,15 @@ def get_product(id,
                 *,
                 db: Session = Depends(database.get_db)):
 
-    product_o = product.get(db=db, id=id)
+    product = product_manager.get_product(db, id)
 
-    if not product_o:
+    if not product:
 
         raise HTTPException(
             status_code=404,
             detail="product does not exist")
 
-    return product_o
+    return product.get()
 
 
 @router.put("/{id}", response_model=ProductResponse)
@@ -66,24 +62,23 @@ def update_product(id,
                    db: Session = Depends(database.get_db),
                    current_user: User = Depends(auth.get_current_active_user)):
 
-    old_product = product.get(db=db, id=id)
+    product = product_manager.get_product(db, id)
 
-    if not old_product:
-
+    if not product:
         raise HTTPException(
             status_code=404,
             detail="product does not exist")
 
-    if old_product.owner_id != current_user.id:
-
+    if product.owner.id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="only owner can update")
 
     update_obj = ProductUpdate(**jsonable_encoder(product_in))
 
-    return product.update_all(db=db,
-                              db_obj=old_product,
-                              obj_in=update_obj,
-                              quantity=product_in.quantity,
-                              categories=product_in.categories)
+    if product_in.quantity:
+        product.update_inventory(product_in.quantity)
+    if product_in.categories:
+        product.update_categories(product_in.categories)
+
+    return product.update(update_obj)

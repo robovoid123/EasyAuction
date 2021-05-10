@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 
 from pydantic import BaseModel
-from app.models.product import Conditions, CategoryList
+from app.models.product import Conditions
 
 
 class ProductBase(BaseModel):
@@ -35,6 +35,14 @@ class InventoryBase(BaseModel):
     restocked_at: Optional[datetime]
 
 
+class InventoryCreate(InventoryBase):
+    quantity: int
+
+
+class InventoryUpdate(InventoryBase):
+    pass
+
+
 class InventoryInDB(InventoryBase):
     id: Optional[int]
 
@@ -43,7 +51,15 @@ class InventoryInDB(InventoryBase):
 
 
 class CategoryBase(BaseModel):
-    category: Optional[str]
+    name: Optional[str]
+
+
+class CategoryCreate(CategoryBase):
+    name: str
+
+
+class CategoryUpdate(CategoryBase):
+    pass
 
 
 class CategoryInDB(CategoryBase):
@@ -58,7 +74,7 @@ class ProductRequest(BaseModel):
     description: Optional[str] = None
     condition: Optional[Conditions] = None
     quantity: Optional[int] = None
-    categories: Optional[List[CategoryList]] = None
+    categories: Optional[List[str]] = None
 
 
 class ProductResponse(ProductInDB):

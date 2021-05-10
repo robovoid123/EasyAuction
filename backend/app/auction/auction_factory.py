@@ -7,15 +7,14 @@ class AuctionFactory:
     def __init__(self):
         self._auction_creators = {}
 
-    def register_auction(self, type, auction_creator):
-        self._auction_creators[type] = auction_creator
+    def register_auction(self, au_type, auction_creator):
+        self._auction_creators[au_type] = auction_creator
 
-    def get_auction(self, type, db, *, crud_auction, crud_auction_session,
-                    crud_bid, id=None) -> Auction:
-        auction_creator = self._auction_creators.get(type)
+    def get_auction(self, au_type, db, id=None) -> Auction:
+        auction_creator = self._auction_creators.get(au_type)
         if not auction_creator:
-            raise ValueError(type)
-        return auction_creator(db, crud_auction, crud_auction_session, crud_bid, id)
+            raise ValueError(au_type)
+        return auction_creator(db, id)
 
 
 factory = AuctionFactory()

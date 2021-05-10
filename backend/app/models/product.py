@@ -12,18 +12,24 @@ class Conditions(str, enum.Enum):
     POOR = 'poor'
 
 
-class CategoryList(str, enum.Enum):
-    ELECTRONIC_DEVICES = 'electornic_devices'
-    BOOKS = 'books'
+product_category = sa.Table(
+    'product_category', Base.metadata, sa.Column(
+        'product_id',
+        sa.Integer,
+        sa.ForeignKey('product.id')),
+    sa. Column(
+        'category_id',
+        sa.Integer,
+        sa.ForeignKey('category.id')))
 
 
 class Category(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
-    category = sa.Column(sa.String)
+    name = sa.Column(sa.String)
 
-    product_id = sa.Column(sa.ForeignKey('product.id'))
-
-    products = relationship("Product", back_populates='categories')
+    products = relationship(
+        'Product', secondary=product_category, back_populates='categories'
+    )
 
 
 class Product(Base):
@@ -39,8 +45,9 @@ class Product(Base):
     inventory_id = sa.Column(sa.ForeignKey('inventory.id'))
 
     owner = relationship("User")
-    categories = relationship("Category", back_populates='products')
     inventory = relationship("Inventory", back_populates='product')
+    categories = relationship(
+        'Category', secondary=product_category, back_populates='products')
 
 
 class Inventory(Base):

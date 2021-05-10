@@ -5,16 +5,18 @@ from app.schedule import schedule_task
 from app.schemas.auction import AuctionSessionCreate, BidCreate
 from app.models.auction import AuctionState, Bid
 
+from app.crud.auction import auction
+from app.crud.auction_session import auction_session
+from app.crud.bid import bid
+
 
 class Auction:
-    def __init__(self, db, auction_crud, auction_session_crud, bid_crud, id):
+    def __init__(self, db, id):
+        # TODO: need depenency for product
         self.db = db
-        self.crud = auction_crud
-        self.crud_session = auction_session_crud
-        self.crud_bid = bid_crud
         self.db_obj = None
         if id:
-            self.db_obj = self.crud.get(db, id)
+            self.db_obj = auction.get(db, id)
 
     @property
     def owner(self):
@@ -24,20 +26,25 @@ class Auction:
         return self.db_obj
 
     def create(self, obj_in):
-        return self.crud.create(self.db, obj_in=obj_in)
+        return auction.create(self.db, obj_in=obj_in)
 
     def update(self, *, obj_in):
-        return self.crud.update(self.db, db_obj=self.db_obj, obj_inj=obj_in)
+        return auction.update(self.db, db_obj=self.db_obj, obj_inj=obj_in)
 
     def remove(self):
-        return self.crud.remove(self.db, id=self.db_obj.id)
+        return auction.remove(self.db, id=self.db_obj.id)
 
-    def create_auction_session(self, obj_in):
-        return self.crud_session.create(self.db, obj_in=obj_in)
+    def create_auction_session(self, state, bid_line, auction_id):
+        obj_in = AuctionSessionCreate(
+            state=state,
+            bid_line=bid_line,
+            auction_id=auction_id
+        )
+        return auction_session.create(self.db, obj_in=obj_in)
 
     def create_bid(self, amount, bidder_id):
         obj_in = BidCreate(amount=amount, bidder_id=bidder_id)
-        return self.crud_bid.create(self.db, obj_in=obj_in)
+        return bid.create(self.db, obj_in=obj_in)
 
     def schedule_ending(self, date, id):
         schedule_task(lambda: self.end(id), date)
@@ -49,6 +56,7 @@ class Auction:
         auction.winner_id = bid.bidder_id
         auction.final_cost = auction_session.bid_line
         auction.is_ended = True
+        # TODO: don't modify product here
         auction.product.inventory.quantity -= 1
         self.db.add(auction)
         self.db.commit()
@@ -133,16 +141,14 @@ class Auction:
         yet then we can start an auciton
         """
         if not auction_session:
-            obj_in = AuctionSessionCreate(
+
+            self.schedule_ending(auction.ending_date, id)
+
+            self.create_auction_session(
                 state=AuctionState.ONGOING,
                 bid_line=auction.starting_bid_amount,
                 auction_id=auction.id
             )
-
-            print(auction, auction.ending_date, '--------------------------')
-            self.schedule_ending(auction.ending_date, id)
-
-            self.create_auction_session(obj_in)
             auction.starting_date = datetime.now()
 
             self.db.add(auction)
