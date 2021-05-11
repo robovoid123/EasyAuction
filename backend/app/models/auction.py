@@ -14,6 +14,8 @@ class AuctionState(str, enum.Enum):
 class AuctionType(str, enum.Enum):
     ENGLISH = 'english'
     DUTCH = 'dutch'
+    BLIND = 'blind'
+    SILENT = 'silent'
 
 
 class Auction(Base):
@@ -23,6 +25,7 @@ class Auction(Base):
     reserve = sa.Column(sa.Float)
     ending_date = sa.Column(sa.DateTime)
     starting_date = sa.Column(sa.DateTime)
+    # TODO: change type name collides with builtin
     type = sa.Column(sa.Enum(AuctionType))
     final_cost = sa.Column(sa.Float)
     is_ended = sa.Column(sa.Boolean, default=0)

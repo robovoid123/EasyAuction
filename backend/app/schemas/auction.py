@@ -1,3 +1,4 @@
+from app.models.auction import AuctionType
 from datetime import datetime
 from typing import Optional
 
@@ -6,28 +7,28 @@ from pydantic import BaseModel
 
 class AuctionBase(BaseModel):
     product_id: Optional[int]
-    owner_id: Optional[int]
     starting_bid_amount: Optional[float]
     bid_cap: Optional[float]
     reserve: Optional[float]
     ending_date: Optional[datetime]
-    type: Optional[str]
+    type: Optional[AuctionType]
 
 
 class AuctionCreate(AuctionBase):
     product_id: int
-    owner_id: int
     starting_bid_amount: float
+    # TODO: ending_date should be > datetime.now()
     ending_date: datetime
-    type: str
+    type: AuctionType
 
 
 class AuctionUpdate(AuctionBase):
-    pass
+    starting_date: Optional[datetime]
 
 
 class AuctionInDB(AuctionBase):
     id: Optional[int]
+    owner_id: Optional[int]
     starting_date: Optional[datetime]
 
     class Config:

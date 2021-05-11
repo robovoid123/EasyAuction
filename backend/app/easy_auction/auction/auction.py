@@ -6,11 +6,15 @@ from app.schedule import schedule_task
 from app.schemas.auction import AuctionSessionCreate, BidCreate
 from app.models.auction import AuctionState, Bid, Auction as AuctionModel
 
-from app.crud.auction import auction
-from app.crud.auction_session import auction_session
-from app.crud.bid import bid
+from app.crud.auction import auction as crud
+from app.crud.auction_session import auction_session as session_crud
+from app.crud.bid import bid as bid_crud
 
 from app.easy_auction.product.product_manager import product_manager
+
+"""
+mapped SQLAlchemy model and added functionality over it
+"""
 
 
 class Auction:
@@ -18,7 +22,7 @@ class Auction:
         self.db = db
         self.db_obj = None
         if id:
-            self.db_obj = auction.get(db, id)
+            self.db_obj = crud.get(db, id)
         if db_obj:
             self.db_obj = db_obj
         if self.db_obj:
@@ -26,30 +30,59 @@ class Auction:
             self._product = product_manager.populate_from_obj(db, product_db_obj)
 
     @property
-    def owner(self):
-        return self.db_obj.owner
+    def owner(self): return self.db_obj.owner
 
     @property
-    def auction_session(self):
-        return self.db_obj.auction_session
+    def auction_session(self): return self.db_obj.auction_session
 
     @property
-    def product(self):
-        return self._product
+    def product(self): return self._product
+
+    @property
+    def starting_bid_amount(self): return self.db_obj.starting_bid_amount
+
+    @property
+    def bid_cap(self): return self.db_obj.bid_cap
+
+    @property
+    def reserve(self): return self.db_obj.reserve
+
+    @property
+    def ending_date(self): return self.db_obj.ending_date
+
+    @property
+    def starting_date(self): return self.db_obj.starting_date
+
+    @property
+    def type(self): return self.db_obj.type
+
+    @property
+    def final_cost(self): return self.db_obj.final_cost
+
+    @property
+    def is_ended(self): return self.db_obj.is_ended
+
+    @property
+    def winner(self): return self.db_obj.winner
 
     @classmethod
-    def create(cls, db, obj_in):
-        db_obj = auction.create(db, obj_in=obj_in)
+    def create(cls, db, obj_in, owner_id):
+        db_obj = crud.create_with_owner(db, obj_in=obj_in, owner_id=owner_id)
         return cls(db, db_obj=db_obj)
 
     def get(self) -> Optional[AuctionModel]:
         return self.db_obj
 
-    def update(self, *, obj_in) -> AuctionModel:
-        return auction.update(self.db, db_obj=self.db_obj, obj_inj=obj_in)
+    def update(self, obj_in) -> AuctionModel:
+        return crud.update(self.db, db_obj=self.db_obj, obj_in=obj_in)
 
     def remove(self):
-        return auction.remove(self.db, id=self.db_obj.id)
+        return crud.remove(self.db, id=self.db_obj.id)
+
+    def update_session(self, obj_in):
+        return session_crud.update(self.db,
+                                   db_obj=self.db_obj.auction_session,
+                                   obj_in=obj_in)
 
     def create_auction_session(self, state, bid_line, auction_id):
         obj_in = AuctionSessionCreate(
@@ -57,63 +90,71 @@ class Auction:
             bid_line=bid_line,
             auction_id=auction_id
         )
-        return auction_session.create(self.db, obj_in=obj_in)
+        return session_crud.create(self.db, obj_in=obj_in)
+
+    def add_session(self, state, bid_line, auction_id):
+        new_session = self.create_auction_session(
+            state=state,
+            bid_line=bid_line,
+            auction_id=auction_id
+        )
+        self.db_obj.auction_session = new_session
+        self.db.add(self.db_obj)
+        self.db.commit()
+        self.db.refresh(self.db_obj)
 
     def create_bid(self, amount, bidder_id):
         obj_in = BidCreate(amount=amount, bidder_id=bidder_id)
-        return bid.create(self.db, obj_in=obj_in)
+        return bid_crud.create(self.db, obj_in=obj_in)
+
+    def append_bid(self, bid):
+        self.db_obj.auction_session.bids.append(bid)
+        self.db.add(self.db_obj)
+        self.db.commit()
+        self.db.refresh(self.db_obj)
 
     def schedule_ending(self, date, id):
         schedule_task(lambda: self.end(id), date)
 
-    def _end_with_winner(self, auction):
-        auction_session = auction.auction_session
-        bid = auction_session.current_highest_bid
+    def _end_with_winner(self):
+        bid = self.auction_session.current_highest_bid
 
-        auction.winner_id = bid.bidder_id
-        auction.final_cost = auction_session.bid_line
-        auction.is_ended = True
+        self.update({
+            'winner_id': bid.bidder_id,
+            'final_cost': self.auction_session.bid_line,
+            'is_ended': True
+        })
+        self.update_session({'state': AuctionState.ENDED})
         new_inven = self.product.inventory.quantity - 1
         self.product.update_inventory(new_inven)
-        self.db.add(auction)
-        self.db.commit()
-        self.db.refresh(auction)
-        return auction
+        return self.db_obj
 
-    def reserve_met(self, auction):
-        bid = auction.auction_session.current_highest_bid
-        if auction.reserve and bid.amount < auction.reserve:
+    def reserve_met(self):
+        bid = self.auction_session.current_highest_bid
+        if self.db_obj.reserve and bid.amount < self.db_obj.reserve:
             return False
         return True
 
-    def _cancel_auction(self, auction):
-        auction_session = auction.auction_session
-
-        auction.is_ended = True
-        auction_session.state = AuctionState.CANCLED
-        self.db.add(auction)
-        self.db.add(auction_session)
-        self.db.commit()
+    def _cancel_auction(self):
+        self.update({'is_ended': True})
+        self.update_session({'state': AuctionState.CANCLED})
 
     def end(self):
-        auction = self.db_obj
-        auction_session = auction.auction_session
-
-        if not auction_session:
+        if not self.auction_session:
             raise HTTPException(
                 status_code=400,
                 detail=""" auction has not yet started """
             )
 
-        if auction_session.state == AuctionState.ONGOING:
-            if auction_session.current_highest_bid:
+        if self.auction_session.state == AuctionState.ONGOING:
+            if self.auction_session.current_highest_bid:
                 """
                 somebody bid in the auction
                 """
-                if self.reserve_met(auction):
-                    return self._end_with_winner(auction)
+                if self.reserve_met():
+                    return self._end_with_winner()
                 else:
-                    self._cancel_auction(auction)
+                    self._cancel_auction()
 
                     raise HTTPException(
                         status_code=200,
@@ -123,56 +164,46 @@ class Auction:
                 """
                 no one bid in auction
                 """
-                if auction.ending_date < datetime.now():
+                if self.db_obj.ending_date < datetime.now():
                     """
                     timelimit is past end auction without winners
                     """
-                    auction.is_ended = True
-                    auction_session.state = AuctionState.ENDED
-                    self.db.add(auction)
-                    self.db.add(auction_session)
-                    self.db.commit()
-                    self.db.refresh(auction)
-                    return auction
+                    self.update({'is_ended': True})
+                    self.update_session({'state': AuctionState.ENDED})
+                    return self.db_obj
                 else:
                     """
                     auction was canceled
                     """
-                    self._cancel_auction(auction)
+                    self._cancel_auction()
                     raise HTTPException(
                         status_code=200,
                         detail=""" canceling auction """
                     )
 
-        elif auction_session.state in [AuctionState.ENDED, AuctionState.CANCLED]:
+        elif self.auction_session.state in [AuctionState.ENDED, AuctionState.CANCLED]:
             raise HTTPException(
                 status_code=400,
-                detail=f" auction already ended {auction_session.state}"
+                detail=f" auction already ended {self.auction_session.state}"
             )
 
-    def _start(self, auction):
-        auction_session = auction.auction_session
-
+    def _start(self):
         """
         if auction session is not created
         yet then we can start an auciton
         """
-        if not auction_session:
+        if not self.auction_session:
 
-            self.schedule_ending(auction.ending_date, id)
+            self.schedule_ending(self.db_obj.ending_date, id)
 
-            self.create_auction_session(
+            # TODO: remove auction_id
+            self.add_session(
                 state=AuctionState.ONGOING,
-                bid_line=auction.starting_bid_amount,
-                auction_id=auction.id
+                bid_line=self.db_obj.starting_bid_amount,
+                auction_id=self.db_obj.id
             )
-            auction.starting_date = datetime.now()
 
-            self.db.add(auction)
-            self.db.commit()
-            self.db.refresh(auction)
-
-            return auction
+            self.update({'starting_date': datetime.now()})
 
         else:
 
@@ -181,21 +212,19 @@ class Auction:
             """
             raise HTTPException(
                 status_code=400,
-                detail=f" auction already {auction_session.state}"
+                detail=f" auction already {self.auction_session.state}"
             )
 
     def start(self, starting_date=None):
-        auction = self.db_obj
-
         if starting_date:
             schedule_task(
-                lambda: self._start(auction),
+                lambda: self._start(),
                 starting_date
             )
             return f"auction has been scheduled for {starting_date}"
 
         else:
-            self._start(auction)
+            self._start()
             return "auction has been started"
 
     def bid(self, amount, user_id) -> Bid:

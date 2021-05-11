@@ -19,11 +19,11 @@ class AuctionFactory:
         if db_obj:
             return auction_creator(db, db_obj=db_obj)
 
-    def get_new_auction(self, au_type, db, obj_in) -> Auction:
+    def get_new_auction(self, au_type, db, obj_in, owner_id) -> Auction:
         auction_creator = self._auction_creators.get(au_type)
         if not auction_creator:
             raise ValueError(au_type)
-        return auction_creator.create(db, obj_in)
+        return auction_creator.create(db, obj_in, owner_id)
 
 
 factory = AuctionFactory()

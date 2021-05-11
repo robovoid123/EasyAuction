@@ -25,7 +25,7 @@ def create_auction(
     auction_in: AuctionCreate
 ):
 
-    return auction_manager.create_auction(db, auction_in).get()
+    return auction_manager.create_auction(db, auction_in, owner_id=current_user.id).get()
 
 
 @router.get('/', response_model=List[AuctionInDB])

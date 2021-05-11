@@ -18,19 +18,32 @@ class Product:
         if db_obj:
             self.db_obj = db_obj
 
-    # TODO: implement all the property of product
+    """
+    doing this will prevent changes from outside the class
+    """
+    @property
+    def inventory(self): return self.db_obj.inventory
 
     @property
-    def inventory(self):
-        return self.db_obj.inventory
+    def categories(self): return self.db_obj.categories
 
     @property
-    def categories(self):
-        return self.db_obj.categories
+    def owner(self): return self.db_obj.owner
 
     @property
-    def owner(self):
-        return self.db_obj.owner
+    def name(self): return self.db_obj.name
+
+    @property
+    def description(self): return self.db_obj.description
+
+    @property
+    def condition(self): return self.db_obj.condition
+
+    @property
+    def created_at(self): return self.db_obj.created_at
+
+    @property
+    def updated_at(self): return self.db_obj.updated_at
 
     @classmethod
     def create(cls, db, obj_in):
