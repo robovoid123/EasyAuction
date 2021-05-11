@@ -1,4 +1,4 @@
-from app.auction.auction import Auction
+from app.easy_auction.auction.auction import Auction
 
 
 class DutchAuction(Auction):

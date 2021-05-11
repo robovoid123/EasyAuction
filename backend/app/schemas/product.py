@@ -32,7 +32,6 @@ class ProductInDB(ProductBase):
 
 class InventoryBase(BaseModel):
     quantity: Optional[int]
-    restocked_at: Optional[datetime]
 
 
 class InventoryCreate(InventoryBase):
@@ -40,11 +39,12 @@ class InventoryCreate(InventoryBase):
 
 
 class InventoryUpdate(InventoryBase):
-    pass
+    restocked_at: Optional[datetime]
 
 
 class InventoryInDB(InventoryBase):
     id: Optional[int]
+    restocked_at: Optional[datetime]
 
     class Config:
         orm_mode = True

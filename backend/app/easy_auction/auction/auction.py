@@ -1,34 +1,51 @@
+from typing import Optional
 from datetime import datetime
 from fastapi import HTTPException
 
 from app.schedule import schedule_task
 from app.schemas.auction import AuctionSessionCreate, BidCreate
-from app.models.auction import AuctionState, Bid
+from app.models.auction import AuctionState, Bid, Auction as AuctionModel
 
 from app.crud.auction import auction
 from app.crud.auction_session import auction_session
 from app.crud.bid import bid
 
+from app.easy_auction.product.product_manager import product_manager
+
 
 class Auction:
-    def __init__(self, db, id):
-        # TODO: need depenency for product
+    def __init__(self, db, id=None, db_obj=None):
         self.db = db
         self.db_obj = None
         if id:
             self.db_obj = auction.get(db, id)
+        if db_obj:
+            self.db_obj = db_obj
+        if self.db_obj:
+            product_db_obj = self.db_obj.product
+            self._product = product_manager.populate_from_obj(db, product_db_obj)
 
     @property
     def owner(self):
         return self.db_obj.owner
 
-    def get(self):
+    @property
+    def auction_session(self):
+        return self.db_obj.auction_session
+
+    @property
+    def product(self):
+        return self._product
+
+    @classmethod
+    def create(cls, db, obj_in):
+        db_obj = auction.create(db, obj_in=obj_in)
+        return cls(db, db_obj=db_obj)
+
+    def get(self) -> Optional[AuctionModel]:
         return self.db_obj
 
-    def create(self, obj_in):
-        return auction.create(self.db, obj_in=obj_in)
-
-    def update(self, *, obj_in):
+    def update(self, *, obj_in) -> AuctionModel:
         return auction.update(self.db, db_obj=self.db_obj, obj_inj=obj_in)
 
     def remove(self):
@@ -56,8 +73,8 @@ class Auction:
         auction.winner_id = bid.bidder_id
         auction.final_cost = auction_session.bid_line
         auction.is_ended = True
-        # TODO: don't modify product here
-        auction.product.inventory.quantity -= 1
+        new_inven = self.product.inventory.quantity - 1
+        self.product.update_inventory(new_inven)
         self.db.add(auction)
         self.db.commit()
         self.db.refresh(auction)

@@ -1,6 +1,6 @@
 from datetime import datetime
 from fastapi import HTTPException
-from app.auction.auction import Auction
+from app.easy_auction.auction.auction import Auction
 from app.models.auction import AuctionState
 
 

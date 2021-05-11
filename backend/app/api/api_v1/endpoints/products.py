@@ -25,9 +25,10 @@ def create_product(*,
         **jsonable_encoder(product_in),
         owner_id=current_user.id)
 
+    # TODO: after implementing property ommit .get()
     return product_manager.create_product(db, product_obj,
                                           quantity=product_in.quantity,
-                                          categories=product_in.categories)
+                                          categories=product_in.categories).get()
 
 
 @router.get("/")

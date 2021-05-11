@@ -12,7 +12,7 @@ from app.schemas.auction import (AuctionCreate,
                                  AuctionInDB,
                                  BidInDB)
 
-from app.auction.auction_system import auction_system
+from app.easy_auction.auction.auction_manager import auction_manager
 
 router = APIRouter()
 
@@ -25,7 +25,7 @@ def create_auction(
     auction_in: AuctionCreate
 ):
 
-    return auction_system.create_auction(db, auction_in)
+    return auction_manager.create_auction(db, auction_in).get()
 
 
 @router.get('/', response_model=List[AuctionInDB])
@@ -34,7 +34,7 @@ def get_auctions(*,
                  skip: int = 0,
                  limit: int = 5):
 
-    return auction_system.get_multi(db, skip=skip, limit=limit)
+    return auction_manager.get_multi(db, skip=skip, limit=limit)
 
 
 @router.post('/{id}/start')
@@ -45,7 +45,7 @@ def start_auction(id,
                   current_user=Depends(get_current_active_user)
                   ):
 
-    auction = auction_system.get_auction(db, id)
+    auction = auction_manager.get_auction(db, id)
 
     if not auction:
 
@@ -69,7 +69,7 @@ def end_auction(id,
                 db: Session = Depends(get_db),
                 current_user=Depends(get_current_active_user)):
 
-    auction = auction_system.get_auction(db, id)
+    auction = auction_manager.get_auction(db, id)
 
     if not auction:
 
@@ -94,7 +94,7 @@ def bid_in_auction(id,
                    amount: int = Body(...),
                    current_user=Depends(get_current_active_user)):
 
-    auction = auction_system.get_auction(db, id)
+    auction = auction_manager.get_auction(db, id)
 
     if not auction:
 
@@ -110,7 +110,7 @@ def get_auction(id,
                 *,
                 db: Session = Depends(get_db)):
 
-    auction = auction_system.get_auction(db, id)
+    auction = auction_manager.get_auction(db, id)
 
     if not auction:
 
@@ -130,7 +130,7 @@ def update_auction(id,
                    auction_in: AuctionUpdate,
                    end_auction: bool = False):
 
-    auction = auction_system.get_auction(db, id)
+    auction = auction_manager.get_auction(db, id)
 
     if not auction:
         raise HTTPException(

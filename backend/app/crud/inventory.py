@@ -1,4 +1,4 @@
-from fastapi.encoder import jsonable_encoder
+from fastapi.encoders import jsonable_encoder
 
 from app.crud.base import CRUDBase
 from app.schemas import product as ps
