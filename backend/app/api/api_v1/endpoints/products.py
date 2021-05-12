@@ -53,7 +53,7 @@ def get_product(id,
             status_code=404,
             detail="product does not exist")
 
-    return product.get()
+    return product
 
 
 @router.put("/{id}", response_model=ProductResponse)
@@ -83,3 +83,8 @@ def update_product(id,
         product.update_categories(product_in.categories)
 
     return product.update(update_obj)
+
+
+@router.delete("/{id}")
+def delete_product():
+    pass

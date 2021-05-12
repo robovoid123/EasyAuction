@@ -23,8 +23,9 @@ class Auction:
         self.db_obj = None
         if id:
             self.db_obj = crud.get(db, id)
-        if db_obj:
+        elif db_obj:
             self.db_obj = db_obj
+
         if self.db_obj:
             product_db_obj = self.db_obj.product
             self._product = product_manager.populate_from_obj(db, product_db_obj)
@@ -125,8 +126,6 @@ class Auction:
             'is_ended': True
         })
         self.update_session({'state': AuctionState.ENDED})
-        new_inven = self.product.inventory.quantity - 1
-        self.product.update_inventory(new_inven)
         return self.db_obj
 
     def reserve_met(self):
@@ -138,12 +137,13 @@ class Auction:
     def _cancel_auction(self):
         self.update({'is_ended': True})
         self.update_session({'state': AuctionState.CANCLED})
+        self.product.free(1)
 
     def end(self):
         if not self.auction_session:
             raise HTTPException(
                 status_code=400,
-                detail=""" auction has not yet started """
+                detail="auction has not yet started"
             )
 
         if self.auction_session.state == AuctionState.ONGOING:
@@ -152,14 +152,11 @@ class Auction:
                 somebody bid in the auction
                 """
                 if self.reserve_met():
-                    return self._end_with_winner()
+                    self._end_with_winner()
+                    return "ending auction with a winner"
                 else:
                     self._cancel_auction()
-
-                    raise HTTPException(
-                        status_code=200,
-                        detail=""" reserve not met so canceling auction """
-                    )
+                    return "reserve not met so canceling auction"
             else:
                 """
                 no one bid in auction
@@ -170,21 +167,19 @@ class Auction:
                     """
                     self.update({'is_ended': True})
                     self.update_session({'state': AuctionState.ENDED})
-                    return self.db_obj
+                    self.product.free(1)
+                    return "ending auction without winner"
                 else:
                     """
                     auction was canceled
                     """
                     self._cancel_auction()
-                    raise HTTPException(
-                        status_code=200,
-                        detail=""" canceling auction """
-                    )
+                    return "canceling auction"
 
         elif self.auction_session.state in [AuctionState.ENDED, AuctionState.CANCLED]:
             raise HTTPException(
                 status_code=400,
-                detail=f" auction already ended {self.auction_session.state}"
+                detail=f"auction already ended {self.auction_session.state}"
             )
 
     def _start(self):
@@ -205,6 +200,11 @@ class Auction:
 
             self.update({'starting_date': datetime.now()})
 
+            # reserving product for auction
+            # TODO: look for better implementation like reserve and free method
+            # TODO: make able to auction multiple item at once
+            self.product.reserve(1)
+
         else:
 
             """
@@ -212,7 +212,7 @@ class Auction:
             """
             raise HTTPException(
                 status_code=400,
-                detail=f" auction already {self.auction_session.state}"
+                detail=f"auction already {self.auction_session.state}"
             )
 
     def start(self, starting_date=None):
@@ -226,6 +226,10 @@ class Auction:
         else:
             self._start()
             return "auction has been started"
+
+    def buy_it_now(self):
+        # TODO: implement
+        pass
 
     def bid(self, amount, user_id) -> Bid:
         pass

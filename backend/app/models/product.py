@@ -12,6 +12,11 @@ class Conditions(str, enum.Enum):
     POOR = 'poor'
 
 
+class Service(str, enum.Enum):
+    AUCTION = 'auction'
+    MARKET = 'market'
+
+
 product_category = sa.Table(
     'product_category', Base.metadata, sa.Column(
         'product_id',
@@ -50,9 +55,23 @@ class Product(Base):
         'Category', secondary=product_category, back_populates='products')
 
 
+"""
+product can be reserved to put in auction, marketed etc
+"""
+
+
+class InventoryReserve(Base):
+    id = sa.Column(sa.Integer, primary_key=True, index=True)
+    quantity = sa.Column(sa.Integer)
+    reserve_in = sa.Column(sa.Enum(Service))
+
+    inventory = relationship('Inventory', back_populates='reserves')
+
+
 class Inventory(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
     quantity = sa.Column(sa.Integer, default=1)
     restocked_at = sa.Column(sa.DateTime)
 
     product = relationship('Product', back_populates='inventory')
+    reserves = relationship('InventoryReserve', back_populates='inventory')

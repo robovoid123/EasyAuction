@@ -33,7 +33,7 @@ class EnglishAuction(Auction):
         if not self.auction_session:
             raise HTTPException(
                 status_code=400,
-                detail=" auction not started yet"
+                detail="auction not started yet"
             )
 
         if self.auction_session.state == AuctionState.ONGOING:
@@ -44,10 +44,10 @@ class EnglishAuction(Auction):
                 abl = self.auction_session.bid_line
                 raise HTTPException(
                     status_code=400,
-                    detail=f" bid amount must be greater than {abl}"
+                    detail=f"bid amount must be greater than {abl}"
                 )
         else:
             raise HTTPException(
                 status_code=400,
-                detail=f" auction already {self.auction_session.state}"
+                detail=f"auction already {self.auction_session.state}"
             )

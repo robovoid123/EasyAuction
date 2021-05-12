@@ -41,6 +41,8 @@ class Auction(Base):
         "AuctionSession", uselist=False, back_populates='auction')
 
 
+# TODO: don't need many to many here
+# TODO: put session_id on bid remove intermediate table
 auction_bid = sa.Table(
     'auction_bid', Base.metadata, sa.Column(
         'auction_session_id',

@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
+from fastapi import HTTPException
 
 from app.crud.product import product
 from app.crud.category import category
@@ -15,14 +16,26 @@ class Product:
         self.db_obj = None
         if id:
             self.db_obj = product.get(db, id)
-        if db_obj:
+        elif db_obj:
             self.db_obj = db_obj
 
     """
     doing this will prevent changes from outside the class
     """
     @property
-    def inventory(self): return self.db_obj.inventory
+    def id(self): return self.db_obj.id
+
+    @property
+    def owner_id(self): return self.db_obj.owner_id
+
+    @property
+    def inventory(self):
+        if self.db_obj.inventory.quantity <= 0:
+            raise HTTPException(
+                status_code=400,
+                detail="product is out of stock"
+            )
+        return self.db_obj.inventory
 
     @property
     def categories(self): return self.db_obj.categories
@@ -97,3 +110,21 @@ class Product:
     # TODO: should take complete categories of present auction
     def update_categories(self, categories):
         pass
+
+    def reserve(self, quantity):
+        if self.inventory.quantity < quantity:
+            raise HTTPException(
+                status_code=400,
+                detail="can't meet the requirement, not enough product in stock"
+            )
+        # TODO: make a reserved_quantity in inventory
+        # use reserve_quantity to free, may require a new table
+        # reserve(for, quantity)
+        # for maybe market or auction
+        new_inven = self.product.inventory.quantity - quantity
+        self.update_inventory(new_inven)
+
+    def free(self, quantity):
+        # this method shoud require no parameter
+        new_inven = self.product.inventory.quantity + quantity
+        self.update_inventory(new_inven)

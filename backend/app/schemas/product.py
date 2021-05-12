@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 
 from pydantic import BaseModel
-from app.models.product import Conditions
+from app.models.product import Conditions, Service
 
 
 class ProductBase(BaseModel):
@@ -48,6 +48,20 @@ class InventoryInDB(InventoryBase):
 
     class Config:
         orm_mode = True
+
+
+class InventoryReserveBase(BaseModel):
+    quantity: Optional[int]
+    reserve_in: Optional[Service]
+
+
+class InventoryReserveCreate(InventoryReserveBase):
+    quantity: int
+    reserve_in: Service
+
+
+class InventoryReserveUpdate(InventoryReserveBase):
+    pass
 
 
 class CategoryBase(BaseModel):

@@ -1,4 +1,5 @@
-from app.models.auction import AuctionType
+from app.models.auction import AuctionType, AuctionState
+from app.schemas.product import ProductBase
 from datetime import datetime
 from typing import Optional
 
@@ -70,3 +71,15 @@ class BidInDB(BidBase):
 
     class Config:
         orm_mode = True
+
+
+class AuctionResponse(BaseModel):
+    id: Optional[int]
+    product: Optional[ProductBase]
+    starting_bid_amount: Optional[float]
+    bid_cap: Optional[float]
+    reserve: Optional[float]
+    ending_date: Optional[datetime]
+    type: Optional[AuctionType]
+    state: Optional[AuctionState]
+    bid_line: Optional[float]

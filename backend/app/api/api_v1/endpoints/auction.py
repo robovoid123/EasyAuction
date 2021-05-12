@@ -10,7 +10,8 @@ from app.models.auction import AuctionState
 from app.schemas.auction import (AuctionCreate,
                                  AuctionUpdate,
                                  AuctionInDB,
-                                 BidInDB)
+                                 BidInDB,
+                                 )
 
 from app.easy_auction.auction.auction_manager import auction_manager
 
@@ -63,7 +64,7 @@ def start_auction(id,
     return auction.start(starting_date=starting_date)
 
 
-@router.post('/{id}/end', response_model=AuctionInDB)
+@router.post('/{id}/end')
 def end_auction(id,
                 *,
                 db: Session = Depends(get_db),
@@ -105,7 +106,7 @@ def bid_in_auction(id,
     return auction.bid(amount, current_user.id)
 
 
-@router.get('/{id}', response_model=AuctionInDB)
+@router.get('/{id}')
 def get_auction(id,
                 *,
                 db: Session = Depends(get_db)):
