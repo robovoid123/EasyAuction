@@ -1,34 +1,27 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from fastapi.encoders import jsonable_encoder
 
 from app.api.dependencies import database, auth
 
 from app.models.user import User
-from app.schemas.product import (ProductRequest,
-                                 ProductResponse,
-                                 ProductCreate,
-                                 ProductUpdate)
+from app.schemas.product import (ProductCreateRequest, ProductInDB,
+                                 ProductUpdateRequest)
 
-from app.easy_auction.product.product_manager import product_manager
+from app.easy_auction.product.product import Product
 
 router = APIRouter()
 
 
-@router.post("/", response_model=ProductResponse)
+@router.post("/", response_model=ProductInDB)
 def create_product(*,
-                   product_in: ProductRequest,
+                   product_in: ProductCreateRequest,
                    db: Session = Depends(database.get_db),
                    current_user: User = Depends(auth.get_current_active_user)):
 
-    product_obj = ProductCreate(
-        **jsonable_encoder(product_in),
-        owner_id=current_user.id)
+    product = Product(db)
+    db_obj = product.create({**product_in.dict(), 'owner_id': current_user.id})
 
-    # TODO: after implementing property ommit .get()
-    return product_manager.create_product(db, product_obj,
-                                          quantity=product_in.quantity,
-                                          categories=product_in.categories).get()
+    return db_obj
 
 
 @router.get("/")
@@ -37,54 +30,67 @@ def get_products(*,
                  limit=5,
                  db: Session = Depends(database.get_db)):
 
-    return product_manager.get_multi(db, skip=skip, limit=limit)
+    product = Product(db)
+    return product.get_multi(skip=skip, limit=limit)
 
 
-@router.get("/{id}", response_model=ProductResponse)
+@router.get("/{id}", response_model=ProductInDB)
 def get_product(id,
                 *,
                 db: Session = Depends(database.get_db)):
 
-    product = product_manager.get_product(db, id)
+    product = Product(db)
+    db_obj = product.get(id)
 
-    if not product:
+    if not db_obj:
 
         raise HTTPException(
             status_code=404,
             detail="product does not exist")
 
-    return product
+    return db_obj
 
 
-@router.put("/{id}", response_model=ProductResponse)
+@router.put("/{id}", response_model=ProductInDB)
 def update_product(id,
                    *,
-                   product_in: ProductRequest,
+                   product_in: ProductUpdateRequest,
                    db: Session = Depends(database.get_db),
                    current_user: User = Depends(auth.get_current_active_user)):
 
-    product = product_manager.get_product(db, id)
+    product = Product(db)
+    db_obj = product.get(id)
 
-    if not product:
+    if not db_obj:
         raise HTTPException(
             status_code=404,
             detail="product does not exist")
 
-    if product.owner.id != current_user.id:
+    if db_obj.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="only owner can update")
 
-    update_obj = ProductUpdate(**jsonable_encoder(product_in))
-
-    if product_in.quantity:
-        product.update_inventory(product_in.quantity)
-    if product_in.categories:
-        product.update_categories(product_in.categories)
-
-    return product.update(update_obj)
+    db_obj = product.update(db_obj, product_in)
+    return db_obj
 
 
-@router.delete("/{id}")
-def delete_product():
-    pass
+# @router.delete("/{id}")
+# def delete_product(
+#         id,
+#         db: Session = Depends(database.get_db),
+#         current_user: User = Depends(auth.get_current_active_user)):
+#     product = Product(db)
+#     db_obj = product.get(id)
+
+#     if not db_obj:
+#         raise HTTPException(
+#             status_code=404,
+#             detail="product does not exist")
+
+#     if db_obj.owner_id != current_user.id:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="only owner can delete")
+
+#     return product.remove(id)

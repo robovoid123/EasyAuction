@@ -1,55 +1,9 @@
 from app.models.auction import AuctionType, AuctionState
-from app.schemas.product import ProductBase
+from app.schemas.product import ProductInDB
 from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
-
-
-class AuctionBase(BaseModel):
-    product_id: Optional[int]
-    starting_bid_amount: Optional[float]
-    bid_cap: Optional[float]
-    reserve: Optional[float]
-    ending_date: Optional[datetime]
-    type: Optional[AuctionType]
-
-
-class AuctionCreate(AuctionBase):
-    product_id: int
-    starting_bid_amount: float
-    # TODO: ending_date should be > datetime.now()
-    ending_date: datetime
-    type: AuctionType
-
-
-class AuctionUpdate(AuctionBase):
-    starting_date: Optional[datetime]
-
-
-class AuctionInDB(AuctionBase):
-    id: Optional[int]
-    owner_id: Optional[int]
-    starting_date: Optional[datetime]
-
-    class Config:
-        orm_mode = True
-
-
-class AuctionSessionBase(BaseModel):
-    state: Optional[str]
-    bid_line: Optional[float]
-    auction_id: Optional[int]
-
-
-class AuctionSessionCreate(AuctionSessionBase):
-    state: str
-    bid_line: float
-    auction_id: int
-
-
-class AuctionSessionUpdate(AuctionSessionBase):
-    pass
 
 
 class BidBase(BaseModel):
@@ -73,13 +27,64 @@ class BidInDB(BidBase):
         orm_mode = True
 
 
-class AuctionResponse(BaseModel):
+class AuctionSessionBase(BaseModel):
+    state: Optional[AuctionState]
+    bid_line: Optional[float]
+    auction_id: Optional[int]
+
+
+class AuctionSessionCreate(AuctionSessionBase):
+    state: AuctionState
+    bid_line: float
+    auction_id: int
+
+
+class AuctionSessionUpdate(AuctionSessionBase):
+    pass
+
+
+class AuctionSessionInDB(AuctionSessionBase):
     id: Optional[int]
-    product: Optional[ProductBase]
+    last_bid_at: Optional[datetime]
+    current_highest_bid: Optional[BidInDB]
+
+    class Config:
+        orm_mode = True
+
+
+class AuctionBase(BaseModel):
     starting_bid_amount: Optional[float]
     bid_cap: Optional[float]
     reserve: Optional[float]
     ending_date: Optional[datetime]
     type: Optional[AuctionType]
-    state: Optional[AuctionState]
-    bid_line: Optional[float]
+
+
+class AuctionCreateRequest(AuctionBase):
+    product_id: int
+    starting_bid_amount: float
+    # TODO: ending_date should be > datetime.now()
+    ending_date: datetime
+    type: AuctionType
+
+
+class AuctionCreate(AuctionCreateRequest):
+    owner_id: int
+
+
+class AuctionUpdate(AuctionBase):
+    product_id: Optional[int]
+    starting_date: Optional[datetime]
+
+
+class AuctionInDB(AuctionBase):
+    id: Optional[int]
+    owner_id: Optional[int]
+    starting_date: Optional[datetime]
+    product: Optional[ProductInDB]
+    auction_session: Optional[AuctionSessionInDB]
+    final_cost: Optional[float]
+    winner_id: Optional[int]
+
+    class Config:
+        orm_mode = True

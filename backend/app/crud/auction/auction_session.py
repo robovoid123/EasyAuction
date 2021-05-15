@@ -8,4 +8,4 @@ class CRUDAuctionSession(CRUDBase[AuctionSession, ap.AuctionSessionCreate,
     pass
 
 
-auction_session = CRUDAuctionSession(AuctionSession)
+crud_auctionsession = CRUDAuctionSession(AuctionSession)

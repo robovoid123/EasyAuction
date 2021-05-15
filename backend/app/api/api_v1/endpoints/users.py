@@ -23,7 +23,7 @@ def register_user(
     """
     Create new user.
     """
-    user = crud_user.user.get_by_email(db, email=email)
+    user = crud_user.user(db).get_by_email(email=email)
     if user:
         raise HTTPException(
             status_code=400,
@@ -31,7 +31,7 @@ def register_user(
         )
     user_in = schemas.UserCreate(
         password=password, email=email, full_name=full_name)
-    user = crud_user.user.create(db, obj_in=user_in)
+    user = crud_user.user(db).create(obj_in=user_in)
     return user
 
 
@@ -40,7 +40,7 @@ def get_user(
     usr_id: int,
     db: Session = Depends(database.get_db)
 ):
-    user = crud_user.user.get(db=db, id=usr_id)
+    user = crud_user.user(db).get(id=usr_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -60,7 +60,7 @@ def read_users(
     """
     Retrieve users.
     """
-    users = crud_user.user.get_multi(db, skip=skip, limit=limit)
+    users = crud_user.user(db).get_multi(skip=skip, limit=limit)
     return users
 
 
@@ -97,5 +97,5 @@ def update_user_me(
         user_in.full_name = full_name
     if email is not None:
         user_in.email = email
-    user = crud_user.user.update(db, db_obj=current_user, obj_in=user_in)
+    user = crud_user.user(db).update(db_obj=current_user, obj_in=user_in)
     return user

@@ -3,8 +3,9 @@ from app.schemas import auction as ap
 from app.models.auction import Bid
 
 
-class CRUDBid(CRUDBase[Bid, ap.BidCreate, ap.BidUpdate]):
+class CRUDBid(CRUDBase[Bid, ap.BidCreate,
+                       ap.BidUpdate]):
     pass
 
 
-bid = CRUDBid(Bid)
+crud_bid = CRUDBid(Bid)

@@ -41,28 +41,16 @@ class Auction(Base):
         "AuctionSession", uselist=False, back_populates='auction')
 
 
-# TODO: don't need many to many here
-# TODO: put session_id on bid remove intermediate table
-auction_bid = sa.Table(
-    'auction_bid', Base.metadata, sa.Column(
-        'auction_session_id',
-        sa.Integer,
-        sa.ForeignKey('auctionsession.id')),
-    sa.Column(
-        'bid_id',
-        sa.Integer,
-        sa.ForeignKey('bid.id')))
-
-
 class Bid(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
     amount = sa.Column(sa.Float)
     created_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())
 
+    session_id = sa.Column(sa.ForeignKey('auctionsession.id'))
     bidder_id = sa.Column(sa.ForeignKey('user.id'))
 
     auction_session = relationship(
-        'AuctionSession', secondary=auction_bid, back_populates='bids')
+        'AuctionSession', foreign_keys=[session_id], back_populates='bids')
 
 
 class AuctionSession(Base):
@@ -77,5 +65,5 @@ class AuctionSession(Base):
 
     auction = relationship('Auction', back_populates='auction_session')
     current_highest_bid = relationship('Bid', foreign_keys=[current_highest_bid_id])
-    bids = relationship('Bid', secondary=auction_bid,
-                        back_populates='auction_session')
+    bids = relationship('Bid', foreign_keys=[
+                        Bid.session_id], back_populates='auction_session')

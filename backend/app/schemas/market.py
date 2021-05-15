@@ -24,7 +24,6 @@ class PublishedProductBase(BaseModel):
     price: Optional[float]
     quantity: Optional[int]
     product_id: Optional[int]
-    shop_id: Optional[int]
 
 
 class PublishedProductCreate(PublishedProductBase):
@@ -37,17 +36,17 @@ class PublishedProductUpdate(PublishedProductBase):
     pass
 
 
-class BuyHistoryBase(BaseModel):
+class PublishedProductLogBase(BaseModel):
     quantity: Optional[float]
     product_id: Optional[int]
     buyer_id: Optional[int]
 
 
-class BuyHistoryCreate(BuyHistoryBase):
+class PublishedProductLogCreate(PublishedProductLogBase):
     quantity: float
     product_id: int
     buyer_id: int
 
 
-class BuyHistoryUpdate(BuyHistoryBase):
+class PublishedProductLogUpdate(PublishedProductLogBase):
     pass

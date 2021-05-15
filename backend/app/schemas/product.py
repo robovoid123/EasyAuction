@@ -2,32 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 
 from pydantic import BaseModel
-from app.models.product import Conditions, Service
-
-
-class ProductBase(BaseModel):
-    name: Optional[str]
-    description: Optional[str]
-    condition: Optional[Conditions]
-    owner_id: Optional[int]
-
-
-class ProductCreate(ProductBase):
-    name: str
-    owner_id: int
-
-
-class ProductUpdate(ProductBase):
-    pass
-
-
-class ProductInDB(ProductBase):
-    id: Optional[int]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-
-    class Config:
-        orm_mode = True
+from app.models.product import Conditions
 
 
 class InventoryBase(BaseModel):
@@ -44,24 +19,10 @@ class InventoryUpdate(InventoryBase):
 
 class InventoryInDB(InventoryBase):
     id: Optional[int]
-    restocked_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
     class Config:
         orm_mode = True
-
-
-class InventoryReserveBase(BaseModel):
-    quantity: Optional[int]
-    reserve_in: Optional[Service]
-
-
-class InventoryReserveCreate(InventoryReserveBase):
-    quantity: int
-    reserve_in: Service
-
-
-class InventoryReserveUpdate(InventoryReserveBase):
-    pass
 
 
 class CategoryBase(BaseModel):
@@ -83,14 +44,38 @@ class CategoryInDB(CategoryBase):
         orm_mode = True
 
 
-class ProductRequest(BaseModel):
+class ProductBase(BaseModel):
+    name: Optional[str]
+    description: Optional[str]
+    condition: Optional[Conditions]
+    owner_id: Optional[int]
+
+
+class ProductCreate(ProductBase):
     name: str
-    description: Optional[str] = None
-    condition: Optional[Conditions] = None
-    quantity: Optional[int] = None
-    categories: Optional[List[str]] = None
+    owner_id: int
 
 
-class ProductResponse(ProductInDB):
-    categories: Optional[List[CategoryInDB]]
+class ProductUpdate(ProductBase):
+    pass
+
+
+class ProductInDB(ProductBase):
+    id: Optional[int]
     inventory: Optional[InventoryInDB]
+    categories: Optional[List[CategoryInDB]]
+
+    class Config:
+        orm_mode = True
+
+
+class ProductUpdateRequest(BaseModel):
+    name: Optional[str]
+    description: Optional[str]
+    condition: Optional[Conditions]
+    quantity: Optional[int]
+    categories: Optional[List[str]]
+
+
+class ProductCreateRequest(ProductUpdateRequest):
+    name: str

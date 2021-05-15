@@ -3,6 +3,16 @@ from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
+product_shop = sa.Table(
+    'product_shop', Base.metadata, sa.Column(
+        'product_id',
+        sa.Integer,
+        sa.ForeignKey('publishedproduct.id')),
+    sa.Column(
+        'shop_id',
+        sa.Integer,
+        sa.ForeignKey('shop.id')))
+
 
 class Shop(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
@@ -11,16 +21,18 @@ class Shop(Base):
 
     owner_id = sa.Column(sa.ForeignKey('user.id'))
 
-    products = relationship("PublishedProduct", back_populates="shop")
+    products = relationship(
+        "PublishedProduct", secondary=product_shop, back_populates="shop")
 
 
-class BuyHistory(Base):
+class PublishedProductLog(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
     quantity = sa.Column(sa.Integer)
+
     product_id = sa.Column(sa.ForeignKey('publishedproduct.id'))
     buyer_id = sa.Column(sa.ForeignKey('user.id'))
 
-    product = relationship("PublishedProduct", back_populates="buy_history")
+    product = relationship("PublishedProduct", back_populates="log")
 
 
 class PublishedProduct(Base):
@@ -29,8 +41,7 @@ class PublishedProduct(Base):
     quantity = sa.Column(sa.Integer)
 
     product_id = sa.Column(sa.ForeignKey('product.id'))
-    shop_id = sa.Column(sa.ForeignKey('shop.id'))
 
     product = relationship("Product")
-    shop = relationship("Shop", back_populates="products")
-    buy_history = relationship("BuyHistory", back_populates="product")
+    shop = relationship("Shop", secondary=product_shop, back_populates="products")
+    log = relationship("BuyHistory", back_populates="product")

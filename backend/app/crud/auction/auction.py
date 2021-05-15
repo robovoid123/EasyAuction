@@ -16,4 +16,4 @@ class CRUDAuction(CRUDBase[Auction, ap.AuctionCreate, ap.AuctionUpdate]):
         return db_obj
 
 
-auction = CRUDAuction(Auction)
+crud_auction = CRUDAuction(Auction)

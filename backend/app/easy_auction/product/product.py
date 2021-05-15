@@ -1,130 +1,50 @@
-from datetime import datetime
-from typing import List, Optional
-from fastapi import HTTPException
+from app.schemas.product import ProductCreate, ProductCreateRequest, ProductUpdate
+from sqlalchemy.orm import Session
 
-from app.crud.product import product
-from app.crud.category import category
-from app.crud.inventory import inventory
-
-from app.schemas.product import InventoryCreate, InventoryUpdate
-from app.models import product as prm
+from app.easy_auction.base import Base
+from app.crud.product.product import crud_product
+from app.easy_auction.product.category import Category
+from app.easy_auction.product.inventory import Inventory
 
 
-class Product:
-    def __init__(self, db, id=None, db_obj=None):
-        self.db = db
-        self.db_obj = None
-        if id:
-            self.db_obj = product.get(db, id)
-        elif db_obj:
-            self.db_obj = db_obj
+class Product(Base):
+    def __init__(self, db: Session):
+        super().__init__(crud_product, db)
+        self.inventory = Inventory(db)
+        self.category = Category(db)
 
-    """
-    doing this will prevent changes from outside the class
-    """
-    @property
-    def id(self): return self.db_obj.id
+    def create(self, obj_in: ProductCreateRequest):
+        product_in = ProductCreate(**obj_in)
+        db_obj = super().create(product_in)
+        inventory = self.inventory.create(
+            {'quantity': obj_in.get('quantity')})
+        self.add_inventory(db_obj, inventory)
+        categories = self.category.get_with_names(obj_in.get('categories'))
+        self.add_categories(db_obj, categories)
+        return db_obj
 
-    @property
-    def owner_id(self): return self.db_obj.owner_id
+    def update(self, db_obj, obj_in):
+        product_in = ProductUpdate(**obj_in.dict(exclude_unset=True))
+        db_obj = super().update(db_obj, product_in)
+        if obj_in.quantity:
+            self.update_inventory(db_obj, obj_in.quantity)
+        return db_obj
 
-    @property
-    def inventory(self):
-        if self.db_obj.inventory.quantity <= 0:
-            raise HTTPException(
-                status_code=400,
-                detail="product is out of stock"
-            )
-        return self.db_obj.inventory
+    def add_inventory(self, db_obj, inventory):
+        self.crud.add_inventory(db_obj, inventory)
 
-    @property
-    def categories(self): return self.db_obj.categories
+    def update_inventory(self, db_obj, quantity):
+        self.inventory.update(db_obj=db_obj.inventory, obj_in={
+            'quantity': quantity
+        })
 
-    @property
-    def owner(self): return self.db_obj.owner
+    def add_categories(self, db_obj, categories):
+        self.crud.add_categories(db_obj, categories)
 
-    @property
-    def name(self): return self.db_obj.name
+    def reserve(self, id, quantity):
+        db_obj = self.get(id)
+        return self.inventory.reserve(db_obj.inventory, quantity)
 
-    @property
-    def description(self): return self.db_obj.description
-
-    @property
-    def condition(self): return self.db_obj.condition
-
-    @property
-    def created_at(self): return self.db_obj.created_at
-
-    @property
-    def updated_at(self): return self.db_obj.updated_at
-
-    @classmethod
-    def create(cls, db, obj_in):
-        db_obj = product.create(db, obj_in=obj_in)
-        return cls(db, db_obj=db_obj)
-
-    def get(self) -> Optional[prm.Product]:
-        return self.db_obj
-
-    def update(self, *, obj_in):
-        return product.update(self.db, db_obj=self.db_obj, obj_inj=obj_in)
-
-    def remove(self):
-        return product.remove(self.db, id=self.db_obj.id)
-
-    def create_inventory(self, quantity):
-        obj_in = InventoryCreate(quantity=quantity)
-        return inventory.create_with_date(self.db, obj_in, datetime.now())
-
-    def update_inventory(self, quantity):
-        db_obj = self.db_obj.inventory
-        obj_in = InventoryUpdate(quantity=quantity)
-        return inventory.update(self.db, db_obj=db_obj, obj_in=obj_in)
-
-    def add_inventory(self, quantity):
-        new_inventory = self.create_inventory(quantity)
-        self.db_obj.inventory = new_inventory
-        self.db.add(self.db_obj)
-        self.db.commit()
-        self.db.refresh(self.db_obj)
-        return self.db_obj.inventory
-
-    def add_category(self, name):
-        cat = category.get_with_name(self.db, name)
-        if cat:
-            self.db_obj.categories.append(cat)
-            self.db.add(self.db_obj)
-            self.db.commit()
-            self.db.refresh(self.db_obj)
-            return cat
-
-    def add_categories(self, names: List[str]):
-        categories = category.get_with_names(self.db, names)
-        if categories:
-            [self.db_obj.categories.append(cat) for cat in categories]
-            self.db.add(self.db_obj)
-            self.db.commit()
-            self.db.refresh(self.db_obj)
-            return self.db_obj.categories
-
-    # TODO: should take complete categories of present auction
-    def update_categories(self, categories):
-        pass
-
-    def reserve(self, quantity):
-        if self.inventory.quantity < quantity:
-            raise HTTPException(
-                status_code=400,
-                detail="can't meet the requirement, not enough product in stock"
-            )
-        # TODO: make a reserved_quantity in inventory
-        # use reserve_quantity to free, may require a new table
-        # reserve(for, quantity)
-        # for maybe market or auction
-        new_inven = self.product.inventory.quantity - quantity
-        self.update_inventory(new_inven)
-
-    def free(self, quantity):
-        # this method shoud require no parameter
-        new_inven = self.product.inventory.quantity + quantity
-        self.update_inventory(new_inven)
+    def free(self, id, quantity):
+        db_obj = self.get(id)
+        return self.inventory.free(db_obj.inventory, quantity)

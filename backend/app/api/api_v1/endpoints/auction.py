@@ -7,13 +7,11 @@ from app.api.dependencies.database import get_db
 from app.api.dependencies.auth import get_current_active_user
 
 from app.models.auction import AuctionState
-from app.schemas.auction import (AuctionCreate,
+from app.schemas.auction import (AuctionCreate, AuctionCreateRequest,
                                  AuctionUpdate,
                                  AuctionInDB,
-                                 BidInDB,
-                                 )
-
-from app.easy_auction.auction.auction_manager import auction_manager
+                                 BidInDB)
+from app.easy_auction.auction.auction import Auction
 
 router = APIRouter()
 
@@ -23,10 +21,12 @@ def create_auction(
     *,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_active_user),
-    auction_in: AuctionCreate
-):
+        auction_in: AuctionCreateRequest):
 
-    return auction_manager.create_auction(db, auction_in, owner_id=current_user.id).get()
+    auction_in = AuctionCreate(**auction_in.dict(), owner_id=current_user.id)
+    print(auction_in)
+    auction = Auction(db)
+    return auction.create(auction_in)
 
 
 @router.get('/', response_model=List[AuctionInDB])
@@ -35,7 +35,8 @@ def get_auctions(*,
                  skip: int = 0,
                  limit: int = 5):
 
-    return auction_manager.get_multi(db, skip=skip, limit=limit)
+    auction = Auction(db)
+    return auction.get_multi(skip=skip, limit=limit)
 
 
 @router.post('/{id}/start')
@@ -46,46 +47,48 @@ def start_auction(id,
                   current_user=Depends(get_current_active_user)
                   ):
 
-    auction = auction_manager.get_auction(db, id)
+    auction = Auction(db)
+    db_obj = auction.get(id)
 
-    if not auction:
+    if not db_obj:
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='auction not found'
         )
 
-    if auction.owner.id != current_user.id:
+    if db_obj.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='only auction owner can do this action'
         )
 
-    return auction.start(starting_date=starting_date)
+    return auction.start(id, starting_date=starting_date)
 
 
-@router.post('/{id}/end')
+@router.post('/{id}/end', response_model=AuctionInDB)
 def end_auction(id,
                 *,
                 db: Session = Depends(get_db),
                 current_user=Depends(get_current_active_user)):
 
-    auction = auction_manager.get_auction(db, id)
+    auction = Auction(db)
+    db_obj = auction.get(id)
 
-    if not auction:
+    if not db_obj:
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='auction not found'
         )
 
-    if auction.owner.id != current_user.id:
+    if db_obj.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='only auction owner can do this action'
         )
 
-    return auction.end()
+    return auction.end(id)
 
 
 @router.post('/{id}/bids', response_model=BidInDB)
@@ -95,32 +98,52 @@ def bid_in_auction(id,
                    amount: int = Body(...),
                    current_user=Depends(get_current_active_user)):
 
-    auction = auction_manager.get_auction(db, id)
+    auction = Auction(db)
+    db_obj = auction.get(id)
 
-    if not auction:
+    if not db_obj:
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='auction not found'
         )
-    return auction.bid(amount, current_user.id)
+    return auction.bid(id, amount, current_user.id)
 
 
-@router.get('/{id}')
+@router.post('/{id}/buy_it_now', response_model=AuctionInDB)
+def buy_it_now(id,
+               *,
+               db: Session = Depends(get_db),
+               current_user=Depends(get_current_active_user)):
+
+    auction = Auction(db)
+    db_obj = auction.get(id)
+
+    if not db_obj:
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='auction not found'
+        )
+    return auction.buy_it_now(id, current_user.id)
+
+
+@router.get('/{id}', response_model=AuctionInDB)
 def get_auction(id,
                 *,
                 db: Session = Depends(get_db)):
 
-    auction = auction_manager.get_auction(db, id)
+    auction = Auction(db)
+    db_obj = auction.get(id)
 
-    if not auction:
+    if not db_obj:
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='auction not found'
         )
 
-    return auction.get()
+    return db_obj
 
 
 @router.put('/{id}', response_model=AuctionInDB)
@@ -131,25 +154,26 @@ def update_auction(id,
                    auction_in: AuctionUpdate,
                    end_auction: bool = False):
 
-    auction = auction_manager.get_auction(db, id)
+    auction = Auction(db)
+    db_obj = auction.get(id)
 
-    if not auction:
+    if not db_obj:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='auction not found'
         )
 
-    if auction.owner.id != current_user.id:
+    if db_obj.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='only auction owner can do this action'
         )
 
     if end_auction:
-        auction.end()
+        auction.end(id)
 
-    if auction.auction_session and\
-            not auction.auction_session.status == AuctionState.ONGOING:
+    if db_obj.auction_session and\
+            not db_obj.auction_session.status == AuctionState.ONGOING:
 
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -157,4 +181,4 @@ def update_auction(id,
              either end or pause the auction"""
         )
 
-    return auction.update(auction_in)
+    return auction.update(db_obj, auction_in)
