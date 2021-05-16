@@ -10,6 +10,10 @@ from app.models.auction import AuctionState
 INC_AMT = 1.25
 
 
+# TODO: all the data required to work with running auction
+# should be inside auction session
+# TODO: create start and end method here which will later be called
+# by auction
 class AuctionSession(Base):
     def __init__(self, db: Session):
         super().__init__(crud_auctionsession, db)

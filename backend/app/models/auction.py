@@ -55,9 +55,11 @@ class Bid(Base):
 
 class AuctionSession(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
-    state = sa.Column(sa.String)
-    # bid should be higher than bid line in English auction
-    bid_line = sa.Column(sa.Float)
+    state = sa.Column(sa.String)  # to track the state
+    bid_line = sa.Column(sa.Float)  # bid line represent the max/min user can bid
+    bid_cap = sa.Column(sa.Float)  # if bid cap set then auction has limit
+    reserve = sa.Column(sa.Float)  # if reserve set then final price must be > reserve
+    current_winner_id = sa.Column(sa.ForeignKey('user.id'))  # track the current winner
     last_bid_at = sa.Column(sa.DateTime)
 
     current_highest_bid_id = sa.Column(sa.ForeignKey('bid.id'))
