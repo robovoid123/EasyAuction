@@ -4,10 +4,10 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import database, auth
 
 from app.models.user import User
-from app.schemas.product import (ProductCreateRequest, ProductInDB,
+from app.schemas.product import (ProductCreate, ProductCreateRequest, ProductInDB, ProductUpdate,
                                  ProductUpdateRequest)
 
-from app.easy_auction.product.product import Product
+from app.crud.product.product import crud_product
 
 router = APIRouter()
 
@@ -18,10 +18,9 @@ def create_product(*,
                    db: Session = Depends(database.get_db),
                    current_user: User = Depends(auth.get_current_active_user)):
 
-    product = Product(db)
-    db_obj = product.create({**product_in.dict(), 'owner_id': current_user.id})
-
-    return db_obj
+    product_obj = ProductCreate(**product_in.dict(), owner_id=current_user.id)
+    return crud_product.create_complete(db, product_obj,
+                                        quantity=product_in.quantity, categories=product_in.categories)
 
 
 @router.get("/")
@@ -30,8 +29,7 @@ def get_products(*,
                  limit=5,
                  db: Session = Depends(database.get_db)):
 
-    product = Product(db)
-    return product.get_multi(skip=skip, limit=limit)
+    return crud_product.get_multi(db, skip=skip, limit=limit)
 
 
 @router.get("/{id}", response_model=ProductInDB)
@@ -39,8 +37,7 @@ def get_product(id,
                 *,
                 db: Session = Depends(database.get_db)):
 
-    product = Product(db)
-    db_obj = product.get(id)
+    db_obj = crud_product.get(db, id)
 
     if not db_obj:
 
@@ -58,8 +55,7 @@ def update_product(id,
                    db: Session = Depends(database.get_db),
                    current_user: User = Depends(auth.get_current_active_user)):
 
-    product = Product(db)
-    db_obj = product.get(id)
+    db_obj = crud_product.get(db, id)
 
     if not db_obj:
         raise HTTPException(
@@ -71,8 +67,9 @@ def update_product(id,
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="only owner can update")
 
-    db_obj = product.update(db_obj, product_in)
-    return db_obj
+    product_obj = ProductUpdate(**product_in.dict(exclude_unset=True))
+    return crud_product.update_complete(
+        db, db_obj, product_obj, quantity=product_in.quantity)
 
 
 # @router.delete("/{id}")

@@ -7,7 +7,7 @@ from app.models.auction import Auction
 
 
 class CRUDAuction(CRUDBase[Auction, ap.AuctionCreate, ap.AuctionUpdate]):
-    def create_with_owner(self, db: Session, obj_in, owner_id):
+    def create_with_owner(self, db: Session, obj_in: ap.AuctionCreate, owner_id: int) -> Auction:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data, owner_id=owner_id)  # type: ignore
         db.add(db_obj)

@@ -24,7 +24,8 @@ if settings.BACKEND_CORS_ORIGINS:
 
 @app.on_event("startup")
 async def startup():
-    sched.start()
+    # sched.start()
+    pass
 
 
 app.include_router(router, prefix=settings.API_V1_STR)

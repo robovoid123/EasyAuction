@@ -25,8 +25,7 @@ class Auction(Base):
     reserve = sa.Column(sa.Float)
     ending_date = sa.Column(sa.DateTime)
     starting_date = sa.Column(sa.DateTime)
-    # TODO: change type name collides with builtin
-    type = sa.Column(sa.Enum(AuctionType))
+    au_type = sa.Column(sa.Enum(AuctionType))
     final_cost = sa.Column(sa.Float)
     is_ended = sa.Column(sa.Boolean, default=0)
 
@@ -37,8 +36,7 @@ class Auction(Base):
     product = relationship("Product")
     owner = relationship("User", foreign_keys=[owner_id])
     winner = relationship("User", foreign_keys=[winner_id])
-    auction_session = relationship(
-        "AuctionSession", uselist=False, back_populates='auction')
+    session = relationship("AuctionSession", back_populates="auction")
 
 
 class Bid(Base):
@@ -59,13 +57,12 @@ class AuctionSession(Base):
     bid_line = sa.Column(sa.Float)  # bid line represent the max/min user can bid
     bid_cap = sa.Column(sa.Float)  # if bid cap set then auction has limit
     reserve = sa.Column(sa.Float)  # if reserve set then final price must be > reserve
-    current_winner_id = sa.Column(sa.ForeignKey('user.id'))  # track the current winner
     last_bid_at = sa.Column(sa.DateTime)
 
-    current_highest_bid_id = sa.Column(sa.ForeignKey('bid.id'))
+    winning_bid_id = sa.Column(sa.ForeignKey('bid.id'))
     auction_id = sa.Column(sa.ForeignKey('auction.id'))
 
-    auction = relationship('Auction', back_populates='auction_session')
-    current_highest_bid = relationship('Bid', foreign_keys=[current_highest_bid_id])
+    auction = relationship('Auction', back_populates='session')
+    winning_bid = relationship('Bid', foreign_keys=[winning_bid_id])
     bids = relationship('Bid', foreign_keys=[
                         Bid.session_id], back_populates='auction_session')

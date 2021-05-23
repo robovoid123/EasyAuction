@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-from app.crud import user as crud_user
+from app.crud.user import user as crud_user
 from app.api.dependencies import database, auth
 from app.core import security
 from app.core.config import settings
@@ -15,7 +15,7 @@ from app.core.config import settings
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=schemas.Token)
+@router.post("/access-token", response_model=schemas.Token)
 def login_access_token(
     db: Session = Depends(database.get_db),
     form_data: OAuth2PasswordRequestForm = Depends()
@@ -23,8 +23,8 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    user = crud_user.user(db).authenticate(
-        email=form_data.username, password=form_data.password
+    user = crud_user.user.authenticate(
+        db, email=form_data.username, password=form_data.password
     )
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
@@ -39,7 +39,7 @@ def login_access_token(
     }
 
 
-@router.post("/login/test-token", response_model=schemas.User)
+@router.post("/test-token", response_model=schemas.User)
 def test_token(current_user: models.User = Depends(auth.get_current_user)) -> Any:
     """
     Test access token
