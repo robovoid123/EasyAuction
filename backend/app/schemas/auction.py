@@ -30,7 +30,6 @@ class BidInDB(BidBase):
 class AuctionSessionBase(BaseModel):
     state: Optional[AuctionState]
     bid_line: Optional[float]
-    auction_id: Optional[int]
     bid_cap: Optional[float]
     reserve: Optional[float]
 
@@ -60,25 +59,17 @@ class AuctionBase(BaseModel):
     starting_bid_amount: Optional[float]
     bid_cap: Optional[float]
     reserve: Optional[float]
-    ending_date: Optional[datetime]
     au_type: Optional[AuctionType]
 
 
-class AuctionCreateRequest(AuctionBase):
+class AuctionCreate(AuctionBase):
     product_id: int
     starting_bid_amount: float
-    # TODO: ending_date should be > datetime.now()
-    ending_date: datetime
     au_type: AuctionType
 
 
-class AuctionCreate(AuctionCreateRequest):
-    owner_id: int
-
-
 class AuctionUpdate(AuctionBase):
-    product_id: Optional[int]
-    starting_date: Optional[datetime]
+    is_ended: Optional[bool]
 
 
 class AuctionInDB(AuctionBase):
@@ -92,3 +83,7 @@ class AuctionInDB(AuctionBase):
 
     class Config:
         orm_mode = True
+
+
+class AuctionCreateRequest(AuctionCreate):
+    pass

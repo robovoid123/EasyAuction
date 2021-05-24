@@ -62,15 +62,7 @@ class Auction:
                     args=[id]
                 )
             else:
-                session = self._start(db, id)
-                sched.add_job(
-                    Auction.end_auction,
-                    'date',
-                    run_date=db_obj.ending_date,
-                    args=[id]
-                )
-                crud_product.reserve(db, id=db_obj.product_id, quantity=1)
-                return session
+                return self._start(db, id)
         else:
             raise HTTPException(status_code=400,
                                 detail=f"auction already {db_obj.auction_session.state}")
@@ -81,7 +73,7 @@ class Auction:
         if not db_obj.session:
             raise Auction.AUCTION_NOT_STARTED
         if session.state == AuctionState.ONGOING:
-            self._end(self, db, id)
+            self._end(db, id=id)
         elif session.state in Auction.ENDED_STATES:
             raise HTTPException(status_code=400,
                                 detail=f"auction already ended {db_obj.auction_session.state}")
@@ -94,10 +86,13 @@ class Auction:
         session: AuctionSession = db_obj.session
         if not session:
             raise Auction.AUCTION_NOT_STARTED
-        auc_obj = AuctionUpdate(is_ended=True, ending_date=datetime.now())
-        crud_auction.update(db, db_obj, auc_obj)
+        auc_obj = AuctionUpdate(is_ended=True)
+        db.refresh(db_obj)
+        crud_auction.update_with_date(
+            db, db_obj=db_obj, obj_in=auc_obj, ending_date=datetime.now())
         sess_obj = AuctionSessionUpdate(state=AuctionState.CANCLED)
-        crud_auctionsession.update(db, session, sess_obj)
+        db.refresh(session)
+        crud_auctionsession.update(db, db_obj=session, obj_in=sess_obj)
         crud_product.free(db, id=db_obj.product_id, quantity=1)
         return session
 
@@ -107,7 +102,7 @@ class Auction:
         if not session:
             raise Auction.AUCTION_NOT_STARTED
         bid_obj = BidCreate(amount=amount, bidder_id=bidder_id)
-        new_bid = crud_bid.create(db, bid_obj)
+        new_bid = crud_bid.create(db, obj_in=bid_obj)
 
         if session.state == AuctionState.ONGOING:
             return self._bid(db, id, new_bid)

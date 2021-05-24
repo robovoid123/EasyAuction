@@ -36,7 +36,7 @@ class Auction(Base):
     product = relationship("Product")
     owner = relationship("User", foreign_keys=[owner_id])
     winner = relationship("User", foreign_keys=[winner_id])
-    session = relationship("AuctionSession", back_populates="auction")
+    session = relationship("AuctionSession", uselist=False, back_populates="auction")
 
 
 class Bid(Base):
