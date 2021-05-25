@@ -70,6 +70,8 @@ class AuctionCreate(AuctionBase):
 
 class AuctionUpdate(AuctionBase):
     is_ended: Optional[bool]
+    final_cost: Optional[float]
+    winner_id: Optional[int]
 
 
 class AuctionInDB(AuctionBase):

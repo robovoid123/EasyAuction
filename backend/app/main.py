@@ -24,6 +24,7 @@ if settings.BACKEND_CORS_ORIGINS:
 
 @app.on_event("startup")
 async def startup():
+    # TODO: make sure we can only start this once
     # sched.start()
     pass
 

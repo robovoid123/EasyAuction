@@ -34,6 +34,26 @@ def test_end_auction(db: Session):
     assert auction_db.session.state == AuctionState.ENDED
 
 
+def test_end_with_winner(db: Session):
+    auction_db = create_random_auction(db)
+
+    auction = auction_factory.get_auction(AuctionType.ENGLISH)
+    auction.start(db, id=auction_db.id)
+    db.refresh(auction_db)
+    assert auction_db.session.state == AuctionState.ONGOING
+    amount = auction_db.reserve + 1
+    bidder = create_random_user(db)
+    auction.bid(db, id=auction_db.id, amount=amount, bidder_id=bidder.id)
+
+    auction_db = crud_auction.get(db, id=auction_db.id)
+    auction.end(db, id=auction_db.id)
+    db.refresh(auction_db)
+    assert auction_db.session.state == AuctionState.ENDED
+    assert auction_db.final_cost == auction_db.session.bid_line
+    assert auction_db.is_ended
+    assert auction_db.winner_id == bidder.id
+
+
 def test_bid_in_auction(db: Session):
     auction_db = create_random_auction(db)
     amount = auction_db.starting_bid_amount + 1
@@ -51,6 +71,10 @@ def test_bid_in_auction(db: Session):
     assert winning_bid.bidder_id == bidder.id
     assert auction_db.session.last_bid_at
     assert auction_db.session.bid_line == amount + 1.25
+
+
+def test_bid_then_win(db: Session):
+    pass
 
 
 def test_buy_it_now(db: Session):

@@ -20,7 +20,7 @@ class CRUDAuction(CRUDBase[Auction, ap.AuctionCreate, ap.AuctionUpdate]):
     def update_with_date(self, db: Session, db_obj: Auction,
                          obj_in: ap.AuctionUpdate, ending_date: datetime) -> Auction:
         return self.update(db, db_obj=db_obj, obj_in={
-            **obj_in.dict(), 'ending_date': ending_date})
+            **obj_in.dict(exclude_unset=True), 'ending_date': ending_date})
 
 
 crud_auction = CRUDAuction(Auction)

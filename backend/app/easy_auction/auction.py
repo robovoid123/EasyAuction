@@ -10,7 +10,6 @@ from app.db.session import SessionLocal
 from app.schemas.auction import AuctionCreate, AuctionSessionUpdate, AuctionUpdate, BidCreate
 from app.crud.auction.auction import crud_auction
 from app.crud.auction.auction_session import crud_auctionsession
-from app.crud.auction.bid import crud_bid
 from app.crud.product.product import crud_product
 
 
@@ -70,6 +69,7 @@ class Auction:
     def end(self, db: Session, id: int):
         db_obj = crud_auction.get(db, id)
         session: AuctionSession = db_obj.session
+        print(session.state)
         if not db_obj.session:
             raise Auction.AUCTION_NOT_STARTED
         if session.state == AuctionState.ONGOING:
@@ -101,16 +101,14 @@ class Auction:
         session: AuctionSession = db_obj.session
         if not session:
             raise Auction.AUCTION_NOT_STARTED
-        bid_obj = BidCreate(amount=amount, bidder_id=bidder_id)
-        new_bid = crud_bid.create(db, obj_in=bid_obj)
 
         if session.state == AuctionState.ONGOING:
-            return self._bid(db, id, new_bid)
+            return self._bid(db, id, amount=amount, bidder_id=bidder_id)
         elif session.state in Auction.ENDED_STATES:
             raise HTTPException(status_code=400,
                                 detail=f"auction already ended {db_obj.auction_session.state}")
 
-    def _bid(self, db: Session, id: int, new_bid: Bid) -> Bid:
+    def _bid(self, db: Session, id: int, amount: float, bidder_id: int) -> Bid:
         raise NotImplemented
 
     def buy_it_now(self, db: Session, id: int, user_id: int) -> AuctionSession:

@@ -10,8 +10,9 @@ from app.schedule import sched
 from app.crud.auction.auction import crud_auction
 from app.crud.auction.auction_session import crud_auctionsession
 from app.crud.product.product import crud_product
+from app.crud.auction.bid import crud_bid
 
-from app.schemas.auction import AuctionSessionCreate, AuctionSessionUpdate, AuctionUpdate
+from app.schemas.auction import AuctionSessionCreate, AuctionSessionUpdate, AuctionUpdate, BidCreate
 
 
 class EnglishAuction(Auction):
@@ -50,14 +51,11 @@ class EnglishAuction(Auction):
             winner_id=bid.bidder_id,
             final_cost=db_obj.session.bid_line,
             is_ended=True,
-            ending_date=datetime.now()
         )
-        db.refresh(db_obj)
-        crud_auction.update(db_obj, auc_obj)
-        sess_obj = AuctionSessionUpdate(state=AuctionState.ENDED)
-        session = db_obj.auction_session
-        db.refresh(session)
-        crud_auctionsession.update(session, sess_obj)
+        crud_auction.update_with_date(
+            db, db_obj=db_obj, obj_in=auc_obj, ending_date=datetime.now())
+        crud_auctionsession.update_state(
+            db, db_obj=db_obj.session, state=AuctionState.ENDED)
 
     def _end_without_winner(self, db: Session, db_obj: AuctionModel) -> None:
         auc_obj = AuctionUpdate(is_ended=True, ending_date=datetime.now())
@@ -82,22 +80,25 @@ class EnglishAuction(Auction):
         else:
             self._end_without_winner(db, db_obj)
 
-    def _bid(self, db: Session, id: int, new_bid: Bid) -> Bid:
+    def _bid(self, db: Session, id: int, amount: float, bidder_id: int) -> Bid:
         db_obj = crud_auction.get(db, id)
         session: AuctionSession = db_obj.session
 
-        if new_bid.amount > session.bid_line:
-            new_bid_line = new_bid.amount + EnglishAuction.INC_AMT
-            if new_bid_line >= session.bid_cap:
+        if amount > session.bid_line:
+            new_bid_line = amount + EnglishAuction.INC_AMT
+            if session.bid_cap and new_bid_line >= session.bid_cap:
                 new_bid_line = session.bid_cap
 
-            sess_obj = AuctionSessionUpdate(
-                winning_bid_id=new_bid.id,
-                bid_line=new_bid_line
-            )
-            db.refresh(session)
-            crud_auctionsession.update_with_date(db, db_obj=session,
-                                                 obj_in=sess_obj, last_bid_at=datetime.now())
+            bid_obj = BidCreate(amount=amount, bidder_id=bidder_id)
+            new_bid = crud_bid.create(db, obj_in=bid_obj)
+
+            crud_auctionsession.add_bid(db, db_obj=session, bid=new_bid)
+            crud_auctionsession.update(
+                db, db_obj=session, obj_in=AuctionSessionUpdate(bid_line=new_bid_line))
+
+            if session.bid_cap and new_bid.amount >= session.bid_cap:
+                self.end(db, id=db_obj.id)
+
             return new_bid
         else:
             abl = session.bid_line

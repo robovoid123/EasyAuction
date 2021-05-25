@@ -41,6 +41,22 @@ def test_create_with_owner(db: Session):
     assert db_obj.au_type == au_type
 
 
+def test_create_auction_with_ending_date_less_then_now(db: Session):
+    pass
+
+
+def test_create_auction_with_bid_cap_less_then_starting_bid_amt(db: Session):
+    pass
+
+
+def test_create_auction_with_reserve_greater_than_bid_cap(db: Session):
+    pass
+
+
+def test_create_auction_with_reserve_less_than_starting_bid_amt(db: Session):
+    pass
+
+
 def test_get_auction(db: Session):
     auction_db = create_random_auction(db)
 
