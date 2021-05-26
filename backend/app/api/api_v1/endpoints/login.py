@@ -10,6 +10,7 @@ from app.crud.user import user as crud_user
 from app.api.dependencies import database, auth
 from app.core import security
 from app.core.config import settings
+import logging
 
 
 router = APIRouter()

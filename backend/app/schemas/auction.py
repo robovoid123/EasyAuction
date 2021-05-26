@@ -47,9 +47,7 @@ class AuctionSessionUpdate(AuctionSessionBase):
 
 
 class AuctionSessionInDB(AuctionSessionBase):
-    id: Optional[int]
-    last_bid_at: Optional[datetime]
-    winning_bid: Optional[BidInDB]
+    auction_id: Optional[int]
 
     class Config:
         orm_mode = True
@@ -78,14 +76,32 @@ class AuctionInDB(AuctionBase):
     id: Optional[int]
     owner_id: Optional[int]
     starting_date: Optional[datetime]
-    product: Optional[ProductInDB]
-    auction_session: Optional[AuctionSessionInDB]
-    final_cost: Optional[float]
-    winner_id: Optional[int]
+    product_id: Optional[int]
 
     class Config:
         orm_mode = True
 
 
+class Auction(AuctionInDB):
+    auction_session: Optional[AuctionSessionInDB]
+    final_cost: Optional[float]
+    winner_id: Optional[int]
+
+
+class AuctionResponse(AuctionBase):
+    id: Optional[int]
+    owner_id: Optional[int]
+    product_id: Optional[int]
+    ending_date: Optional[datetime]
+    starting_date: Optional[datetime]
+    is_ended: Optional[bool]
+    final_cost: Optional[float]
+    winner_id: Optional[int]
+
+    bid_line: Optional[float]
+    state: Optional[AuctionState]
+    last_bid_at: Optional[datetime]
+
+
 class AuctionCreateRequest(AuctionCreate):
-    pass
+    ending_date: datetime

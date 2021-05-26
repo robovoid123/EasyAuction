@@ -40,11 +40,15 @@ class Auction:
         finally:
             db.close()
 
-    def create(self, db: Session, obj_in: AuctionCreate) -> AuctionModel:
-        return crud_auction.create(db, obj_in=obj_in)
+    # TODO: if creation of auction starts to get different use this
+    def create(self, db: Session, obj_in: AuctionCreate, owner_id: int, ending_date: datetime) -> AuctionModel:
+        return crud_auction.create_with_owner(db, obj_in=obj_in, owner_id=owner_id, ending_date=ending_date)
 
     def update(self, db: Session, db_obj: AuctionModel, obj_in: AuctionUpdate) -> AuctionModel:
         return crud_auction.update(db, db_obj=db_obj, obj_in=obj_in)
+
+    def get(self, db: Session, id: int) -> AuctionModel:
+        return crud_auction.get(db, id)
 
     def _start(self, db: Session, id: int) -> AuctionSession:
         raise NotImplemented
@@ -64,19 +68,18 @@ class Auction:
                 return self._start(db, id)
         else:
             raise HTTPException(status_code=400,
-                                detail=f"auction already {db_obj.auction_session.state}")
+                                detail=f"auction already {db_obj.session.state}")
 
     def end(self, db: Session, id: int):
         db_obj = crud_auction.get(db, id)
         session: AuctionSession = db_obj.session
-        print(session.state)
         if not db_obj.session:
             raise Auction.AUCTION_NOT_STARTED
         if session.state == AuctionState.ONGOING:
             self._end(db, id=id)
         elif session.state in Auction.ENDED_STATES:
             raise HTTPException(status_code=400,
-                                detail=f"auction already ended {db_obj.auction_session.state}")
+                                detail=f"auction already ended {db_obj.session.state}")
 
     def _end(self, db: Session, id: int) -> None:
         raise NotImplemented
@@ -106,12 +109,15 @@ class Auction:
             return self._bid(db, id, amount=amount, bidder_id=bidder_id)
         elif session.state in Auction.ENDED_STATES:
             raise HTTPException(status_code=400,
-                                detail=f"auction already ended {db_obj.auction_session.state}")
+                                detail=f"auction already {db_obj.session.state}")
 
     def _bid(self, db: Session, id: int, amount: float, bidder_id: int) -> Bid:
         raise NotImplemented
 
     def buy_it_now(self, db: Session, id: int, user_id: int) -> AuctionSession:
         db_obj = crud_auction.get(db, id)
+        if not db_obj.bid_cap:
+            raise HTTPException(status_code=400,
+                                detail="auction does not have this feature")
         self.bid(db, id, amount=db_obj.bid_cap, bidder_id=user_id)
         return db_obj.session

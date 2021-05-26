@@ -19,10 +19,13 @@ class InventoryUpdate(InventoryBase):
 
 class InventoryInDB(InventoryBase):
     id: Optional[int]
-    updated_at: Optional[datetime]
 
     class Config:
         orm_mode = True
+
+
+class Inventory(InventoryInDB):
+    updated_at: Optional[datetime]
 
 
 class CategoryBase(BaseModel):
@@ -62,11 +65,14 @@ class ProductUpdate(ProductBase):
 
 class ProductInDB(ProductBase):
     id: Optional[int]
-    inventory: Optional[InventoryInDB]
-    categories: Optional[List[CategoryInDB]]
 
     class Config:
         orm_mode = True
+
+
+class Product(ProductInDB):
+    inventory: Optional[InventoryInDB]
+    categories: Optional[List[CategoryInDB]]
 
 
 class ProductUpdateRequest(BaseModel):
@@ -79,3 +85,13 @@ class ProductUpdateRequest(BaseModel):
 
 class ProductCreateRequest(ProductUpdateRequest):
     name: str
+
+
+class ProductResponse(ProductBase):
+    id: Optional[int]
+    quantity: Optional[int]
+    categories: Optional[List[str]]
+
+
+class ProductMultiResponse(ProductInDB):
+    pass

@@ -1,6 +1,7 @@
 from typing import List
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Body
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_user
 
@@ -8,7 +9,7 @@ from app.api.dependencies.database import get_db
 from app.api.dependencies.auth import get_current_active_user
 
 from app.models.auction import AuctionState
-from app.schemas.auction import (AuctionCreate, AuctionCreateRequest,
+from app.schemas.auction import (AuctionCreate, AuctionCreateRequest, AuctionResponse, AuctionSessionInDB,
                                  AuctionUpdate,
                                  AuctionInDB,
                                  BidInDB)
@@ -34,9 +35,20 @@ def create_auction(*,
                    current_user=Depends(get_current_active_user),
                    auction_in: AuctionCreateRequest):
 
-    auction_in = AuctionCreate(**auction_in.dict(), owner_id=current_user.id)
+    obj_in = AuctionCreate(**auction_in.dict(exclude_unset=True))
     auction = auction_factory.get_auction(auction_in.au_type)
-    return auction.create(db, auction_in)
+    db_obj = auction.create(db, obj_in=obj_in, owner_id=current_user.id,
+                            ending_date=auction_in.ending_date)
+    obj = jsonable_encoder(db_obj)
+    if db_obj.session:
+        state = db_obj.session.state
+        bid_line = db_obj.session.bid_line
+        last_bid_at = db_obj.session.last_bid_at
+        obj["state"] = state
+        obj["bid_line"] = bid_line
+        obj["last_bid_at"] = last_bid_at
+
+    return obj
 
 
 @router.get('/', response_model=List[AuctionInDB])
@@ -48,7 +60,7 @@ def get_auctions(*,
     return crud_auction.get_multi(db, skip=skip, limit=limit)
 
 
-@router.post('/{id}/start')
+@router.post('/{id}/start', response_model=AuctionSessionInDB)
 def start_auction(id,
                   *,
                   db: Session = Depends(get_db),
@@ -57,15 +69,15 @@ def start_auction(id,
                   ):
 
     db_obj = crud_auction.get(db, id)
-    auction = auction_factory.get_auction(db_obj.au_type)
 
     if not db_obj:
         raise AUCTION_NOT_FOUND_EXCEPTION
 
     if db_obj.owner_id != current_user.id:
         raise OWNER_ONLY_EXCEPTION
+    auction = auction_factory.get_auction(db_obj.au_type)
 
-    return auction.start(db, id, starting_date=starting_date)
+    return auction.start(db, id=id, starting_date=starting_date)
 
 
 # @router.post('/{id}/end', response_model=AuctionInDB)
@@ -85,20 +97,20 @@ def start_auction(id,
 
 #     return auction.end(id)
 
-@router.post('/{id}/cancel', response_model=AuctionInDB)
+@router.post('/{id}/cancel', response_model=AuctionSessionInDB)
 def cancel_auction(id,
                    *,
                    db: Session = Depends(get_db),
                    current_user=Depends(get_current_active_user)):
 
     db_obj = crud_auction.get(db, id)
-    auction = auction_factory.get_auction(db_obj.au_type)
 
     if not db_obj:
         raise AUCTION_NOT_FOUND_EXCEPTION
 
     if db_obj.owner_id != current_user.id:
         raise OWNER_ONLY_EXCEPTION
+    auction = auction_factory.get_auction(db_obj.au_type)
 
     return auction.cancel(db, id)
 
@@ -111,30 +123,30 @@ def bid(id,
         current_user=Depends(get_current_active_user)):
 
     db_obj = crud_auction.get(db, id)
-    auction = auction_factory.get_auction(db_obj.au_type)
 
     if not db_obj:
 
         raise AUCTION_NOT_FOUND_EXCEPTION
+    auction = auction_factory.get_auction(db_obj.au_type)
     return auction.bid(db, id, amount, current_user.id)
 
 
-@router.post('/{id}/buy_it_now', response_model=AuctionInDB)
+@router.post('/{id}/buy_it_now', response_model=AuctionSessionInDB)
 def buy_it_now(id,
                *,
                db: Session = Depends(get_db),
                current_user=Depends(get_current_active_user)):
 
     db_obj = crud_auction.get(db, id)
-    auction = auction_factory.get_auction(db_obj.au_type)
 
     if not db_obj:
         raise AUCTION_NOT_FOUND_EXCEPTION
+    auction = auction_factory.get_auction(db_obj.au_type)
 
     return auction.buy_it_now(db, id, current_user.id)
 
 
-@router.get('/{id}', response_model=AuctionInDB)
+@router.get('/{id}', response_model=AuctionResponse)
 def get_auction(id,
                 *,
                 db: Session = Depends(get_db)):
@@ -144,7 +156,15 @@ def get_auction(id,
     if not db_obj:
         raise AUCTION_NOT_FOUND_EXCEPTION
 
-    return db_obj
+    obj = jsonable_encoder(db_obj)
+    if db_obj.session:
+        state = db_obj.session.state
+        bid_line = db_obj.session.bid_line
+        last_bid_at = db_obj.session.last_bid_at
+        obj["state"] = state
+        obj["bid_line"] = bid_line
+        obj["last_bid_at"] = last_bid_at
+    return obj
 
 
 @router.put('/{id}', response_model=AuctionInDB)
@@ -155,7 +175,6 @@ def update_auction(id,
                    auction_in: AuctionUpdate):
 
     db_obj = crud_auction.get(db, id)
-    auction = auction_factory.get_auction(db_obj.au_type)
 
     if not db_obj:
         raise AUCTION_NOT_FOUND_EXCEPTION
@@ -171,5 +190,15 @@ def update_auction(id,
             detail="""can\'t update an already started auction.
              either end or pause the auction"""
         )
+    auction = auction_factory.get_auction(db_obj.au_type)
 
-    return auction.update(db, db_obj, auction_in)
+    db_obj = auction.update(db, db_obj, auction_in)
+    obj = jsonable_encoder(db_obj)
+    if db_obj.session:
+        state = db_obj.session.state
+        bid_line = db_obj.session.bid_line
+        last_bid_at = db_obj.session.last_bid_at
+        obj["state"] = state
+        obj["bid_line"] = bid_line
+        obj["last_bid_at"] = last_bid_at
+    return obj
