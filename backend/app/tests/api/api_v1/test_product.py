@@ -30,10 +30,8 @@ def test_create_product(
     assert content["name"] == name
     assert content["description"] == desc
     assert content["condition"] == condition
-    assert "inventory" in content
-    assert "id" in content["inventory"]
-    assert content["inventory"]["quantity"] == quantity
-    assert "categories" in content
+    assert content["quantity"] == quantity
+    assert content["categories"] == categories
     assert "owner_id" in content
     assert "id" in content
 
