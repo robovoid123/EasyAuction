@@ -5,7 +5,7 @@ from pydantic import AnyHttpUrl, BaseSettings, validator
 
 
 class Settings(BaseSettings):
-    API_V1_STR: str = "/api/v1"
+    API_PREFIX: str = "/api"
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
@@ -35,9 +35,6 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         return f"postgresql://{values.get('POSTGRES_USER')}:{values.get('POSTGRES_PASSWORD')}@{values.get('POSTGRES_SERVER')}:{values.get('POSTGRES_PORT')}/{values.get('POSTGRES_DB')}"
-
-    REDIS_HOST: str
-    REDIS_PORT: str
 
     FIRST_SUPERUSER: str = "superuser@example.com"
     FIRST_SUPERUSER_PASSWORD: str = "password"

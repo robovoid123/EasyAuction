@@ -3,10 +3,10 @@ from typing import Dict
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.crud.user.user import user as crud_user
 from app.core.config import settings
-from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate
+from app.modules.user.models import User
+from app.modules.user.schemas import UserCreate, UserUpdate
+from app.modules.user.repositories import user_repo
 from app.tests.utils.utils import random_email, random_lower_string
 
 
@@ -15,7 +15,7 @@ def user_authentication_headers(
 ) -> Dict[str, str]:
     data = {"username": email, "password": password}
 
-    r = client.post(f"{settings.API_V1_STR}/auth/access-token", data=data)
+    r = client.post(f"{settings.API_PREFIX}/v1/auth/access-token", data=data)
     response = r.json()
     auth_token = response["access_token"]
     headers = {"Authorization": f"Bearer {auth_token}"}
@@ -26,7 +26,7 @@ def create_random_user(db: Session) -> User:
     email = random_email()
     password = random_lower_string()
     user_in = UserCreate(username=email, email=email, password=password)
-    user = crud_user.create(db=db, obj_in=user_in)
+    user = user_repo.create(db=db, obj_in=user_in)
     return user
 
 
@@ -38,12 +38,12 @@ def authentication_token_from_email(
     If the user doesn't exist it is created first.
     """
     password = random_lower_string()
-    user = crud_user.get_by_email(db, email=email)
+    user = user_repo.get_by_email(db, email=email)
     if not user:
         user_in_create = UserCreate(email=email, password=password)
-        user = crud_user.create(db, obj_in=user_in_create)
+        user = user_repo.create(db, obj_in=user_in_create)
     else:
         user_in_update = UserUpdate(password=password)
-        user = crud_user.update(db, db_obj=user, obj_in=user_in_update)
+        user = user_repo.update(db, db_obj=user, obj_in=user_in_update)
 
     return user_authentication_headers(client=client, email=email, password=password)

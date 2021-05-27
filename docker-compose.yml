@@ -1,9 +1,5 @@
 version: '3.8'
 services:
-  redis:
-    image: redis
-    networks:
-      - backend_network
   server:
     build:
       context: ./backend
@@ -17,7 +13,6 @@ services:
       - 8000:8000
     depends_on: 
       - db
-      - redis
     networks: 
       - backend_network
 
