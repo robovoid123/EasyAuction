@@ -12,34 +12,87 @@ from app.tests.utils.product import (random_condition,
 from app.tests.utils.utils import random_lower_string
 
 
-def test_create_complete_product(db: Session):
+def create_random_product_without_inventory(db: Session):
     user = create_random_user(db)
-    quantity = randint(1, 100)
-    categories = get_categories(db)
-    category_ids = [c.id for c in categories]
     name = random_lower_string()
     desc = random_lower_string()
     condition = random_condition()
-    prod_obj = ProductCreate(
-        name=name,
-        owner_id=user.id,
-        description=desc,
-        condition=condition,
-    )
-    product = product_repo.create_complete(db, obj_in=prod_obj, owner_id=user.id,
-                                           quantity=quantity, category_ids=category_ids)
 
-    db_obj = product_repo.get(db, id=product.id)
+    obj_in = ProductCreate(name=name, description=desc, condition=condition)
+    return product_repo.create_with_owner(db, obj_in=obj_in, owner_id=user.id)
 
-    assert db_obj == product
-    assert db_obj.owner_id == user.id
-    assert db_obj.inventory
-    assert db_obj.inventory.quantity == quantity
-    assert db_obj.categories
-    assert db_obj.categories == categories
+
+def test_create_with_owner(db: Session):
+    user = create_random_user(db)
+    name = random_lower_string()
+    desc = random_lower_string()
+    condition = random_condition()
+
+    obj_in = ProductCreate(name=name, description=desc, condition=condition)
+    db_obj = product_repo.create_with_owner(db, obj_in=obj_in, owner_id=user.id)
+
+    assert db_obj
+    assert db_obj.id
     assert db_obj.name == name
     assert db_obj.description == desc
     assert db_obj.condition == condition
+
+
+def test_create_inventory(db: Session):
+    db_obj = create_random_product_without_inventory(db)
+
+    quantity = randint(1, 100)
+
+    inven = product_repo.create_inventory(db, db_obj=db_obj, quantity=quantity)
+    db.refresh(db_obj)
+
+    assert inven
+    assert inven.id
+    assert db_obj.inventory
+    assert db_obj.inventory.id
+    assert db_obj.inventory.quantity == quantity
+
+
+def test_update_inventory(db: Session):
+    db_obj = create_random_product_without_inventory(db)
+
+    quantity = randint(1, 100)
+    inven = product_repo.create_inventory(db, db_obj=db_obj, quantity=quantity)
+    assert inven.quantity == quantity
+    old_update_at = inven.updated_at
+
+    db.refresh(db_obj)
+
+    new_quantity = randint(1, 100)
+    new_inven = product_repo.update_inventory(db, db_obj=db_obj, quantity=new_quantity)
+    assert new_inven.quantity == new_quantity
+    assert new_inven.updated_at > old_update_at
+
+
+def test_add_categories(db: Session):
+    db_obj = create_random_product_without_inventory(db)
+    categories = get_categories(db)
+    category_ids = [c.id for c in categories]
+
+    product_repo.add_categories(db, db_obj=db_obj, category_ids=category_ids)
+    db.refresh(db_obj)
+    assert db_obj.categories
+    assert db_obj.categories == categories
+
+
+def test_remove_categories(db: Session):
+    db_obj = create_random_product_without_inventory(db)
+    categories = get_categories(db)
+    category_ids = [c.id for c in categories]
+
+    product_repo.add_categories(db, db_obj=db_obj, category_ids=category_ids)
+    db.refresh(db_obj)
+    assert db_obj.categories == categories
+
+    product_repo.remove_categories(db, db_obj=db_obj, category_ids=category_ids)
+
+    db.refresh(db_obj)
+    assert db_obj.categories not in categories
 
 
 def test_get_product(db: Session):
@@ -53,9 +106,8 @@ def test_get_product(db: Session):
     assert db_obj.categories
 
 
-def test_update_complete_product(db: Session):
-    prod_db = create_random_product(db)
-    quantity = randint(1, 100)
+def test_update_product(db: Session):
+    db_obj = create_random_product_without_inventory(db)
     name = random_lower_string()
     desc = random_lower_string()
     condition = random_condition()
@@ -65,75 +117,15 @@ def test_update_complete_product(db: Session):
         description=desc,
         condition=condition
     )
-    product_repo.update_complete(db, db_obj=prod_db, obj_in=update_obj,
-                                 quantity=quantity)
-    db_obj = product_repo.get(db, prod_db.id)
+    product_repo.update(db, db_obj=db_obj, obj_in=update_obj)
+
+    db.refresh(db_obj)
 
     assert db_obj
     assert db_obj.name == name
     assert db_obj.description == desc
     assert db_obj.condition == condition
-    assert db_obj.inventory.quantity == quantity
-    assert db_obj.categories == prod_db.categories
 
 
 def test_delete_product(db: Session):
     pass
-
-
-def test_reserve_product(db: Session):
-    prod_db = create_random_product(db)
-    prev_quantity = prod_db.inventory.quantity
-    reserve_quantity = int(prev_quantity - prev_quantity / 2)
-    final_quantity = prev_quantity - reserve_quantity
-    service_type = ServiceType.AUCTION
-
-    product_repo.reserve(db, db_obj=prod_db, quantity=reserve_quantity,
-                         service_type=service_type)
-    db_obj = product_repo.get(db, prod_db.id)
-
-    assert db_obj
-    assert db_obj.inventory.quantity == final_quantity
-    assert db_obj.inventory.reserve
-
-
-def test_unreserve_product(db: Session):
-    prod_db = create_random_product(db)
-    service_type = ServiceType.AUCTION
-
-    prev_quantity = prod_db.inventory.quantity
-    reserve_quantity = int(prev_quantity - prev_quantity / 2)
-    final_quantity = prev_quantity - reserve_quantity
-    product_repo.reserve(db, db_obj=prod_db, quantity=final_quantity,
-                         service_type=service_type)
-
-    assert prod_db.inventory.reserve
-
-    prod_db = product_repo.get(db, prod_db.id)
-
-    product_repo.unreserve(db, db_obj=prod_db, service_type=service_type)
-    db_obj = product_repo.get(db, prod_db.id)
-
-    assert db_obj
-    assert db_obj.inventory.quantity
-    assert not db_obj.inventory.reserve
-
-
-def test_free_product(db: Session):
-    prod_db = create_random_product(db)
-    service_type = ServiceType.AUCTION
-
-    prev_quantity = prod_db.inventory.quantity
-    reserve_quantity = int(prev_quantity - prev_quantity / 2)
-    final_quantity = prev_quantity - reserve_quantity
-    product_repo.reserve(db, db_obj=prod_db, quantity=final_quantity,
-                         service_type=service_type)
-
-    assert prod_db.inventory.reserve
-
-    prod_db = product_repo.get(db, prod_db.id)
-
-    product_repo.free(db, db_obj=prod_db, service_type=service_type)
-
-    assert prod_db.inventory.quantity == final_quantity
-    assert not prod_db.inventory.reserve

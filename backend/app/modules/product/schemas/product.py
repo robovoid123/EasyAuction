@@ -1,10 +1,11 @@
 from typing import Optional, List
 
 from pydantic import BaseModel
-from .category import CategoryInDB
-from .inventory import InventoryInDB
 
 from app.modules.product.models import Conditions
+
+from .category import CategoryInDB
+from .inventory import InventoryInDB
 
 
 class ProductBase(BaseModel):
@@ -37,12 +38,12 @@ class ProductUpdateRequest(BaseModel):
     name: Optional[str]
     description: Optional[str]
     condition: Optional[Conditions]
-    quantity: Optional[int]
-    categories: Optional[List[int]]
 
 
 class ProductCreateRequest(ProductUpdateRequest):
     name: str
+    categories: Optional[List[int]]
+    quantity: Optional[int]
 
 
 class ProductResponse(ProductInDB):

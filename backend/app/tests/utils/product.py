@@ -40,5 +40,8 @@ def create_random_product(db: Session) -> ProductModel:
         description=desc,
         condition=condition,
     )
-    return product_repo.create_complete(db, obj_in=prod_obj, owner_id=user.id,
-                                        quantity=quantity, category_ids=category_ids)
+
+    db_obj = product_repo.create_with_owner(db, obj_in=prod_obj, owner_id=user.id)
+    product_repo.create_inventory(db, db_obj=db_obj, quantity=quantity)
+    product_repo.add_categories(db, db_obj=db_obj, category_ids=category_ids)
+    return db_obj

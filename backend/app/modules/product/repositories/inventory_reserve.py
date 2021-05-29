@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from app.repository.repository_base import BaseRepository
+
 from app.modules.product.schemas import InventoryReserveCreate, InventoryReserveUpdate
-from app.modules.product.models import ServiceType, InventoryReserve
+from app.modules.product.models import InventoryReserve
 
 
 class InventoryReserveRepository(BaseRepository[InventoryReserve, InventoryReserveCreate,

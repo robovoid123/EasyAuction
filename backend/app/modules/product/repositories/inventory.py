@@ -1,12 +1,13 @@
 from typing import Optional
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
 from app.repository.repository_base import BaseRepository
-from .inventory_reserve import inventory_reserve_repo
+
 from app.modules.product.schemas import InventoryCreate, InventoryUpdate, InventoryReserveCreate
 from app.modules.product.models import Inventory, ServiceType, InventoryReserve
+
+from .inventory_reserve import inventory_reserve_repo
 
 NOT_ENOUGH_PRODUCT_EXCEPTION = HTTPException(status_code=400,
                                              detail="cannot reserve not enough product in inventory")

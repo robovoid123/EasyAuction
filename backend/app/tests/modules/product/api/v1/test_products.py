@@ -39,3 +39,9 @@ def test_create_product(
 
 def test_get_product(): pass
 def test_update_product(): pass
+def test_delete_product(): pass
+def test_get_reserves(): pass
+def test_unreserve(): pass
+def test_update_inventory(): pass
+def test_add_categories(): pass
+def test_delete_categories(): pass

@@ -13,11 +13,12 @@ class InventoryCreate(InventoryBase):
 
 
 class InventoryUpdate(InventoryBase):
-    restocked_at: Optional[datetime]
+    pass
 
 
 class InventoryInDB(InventoryBase):
     id: Optional[int]
+    restocked_at: Optional[datetime]
 
     class Config:
         orm_mode = True
