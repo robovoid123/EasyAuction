@@ -61,7 +61,7 @@ class EnglishAuction:
             auction_repo.change_state(db, db_obj=db_obj, state=AuctionState.CANCLED)
         else:
             if db_obj.winning_bid:
-                db_obj.final_winner_id == db_obj.winning_bid.bidder_id
+                db_obj.final_winner_id = db_obj.winning_bid.bidder_id
                 db.add(db_obj)
                 db.commit()
                 db.refresh(db_obj)
