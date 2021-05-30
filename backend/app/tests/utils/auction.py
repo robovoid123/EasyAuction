@@ -1,32 +1,26 @@
-
 from sqlalchemy.orm.session import Session
 
 from sqlalchemy.orm.session import Session
-from datetime import datetime, timedelta
 
-from app.schemas.auction import AuctionCreate
-from app.models.auction import AuctionType, Auction as AuctionModel
+from app.modules.auction.schemas.auction import AuctionCreate
+from app.modules.auction.models.auction import Auction
 from app.tests.utils.product import create_random_product
 from app.tests.utils.utils import random_float
-from app.crud.auction.auction import crud_auction
+from app.modules.auction.repositories import auction_repo
 
 
-def create_random_auction(db: Session) -> AuctionModel:
+def create_random_auction(db: Session) -> Auction:
 
-    prod_db = create_random_product(db)
-    starting_bid_amount = random_float()
-    reserve = starting_bid_amount + random_float()
-    bid_cap = reserve + random_float()
-    ending_date = datetime.now() + timedelta(days=2)
-    au_type = AuctionType.ENGLISH
-    owner_id = prod_db.owner_id
+    product = create_random_product(db)
+    starting_amount = random_float()
+    reserve = starting_amount + random_float() + 2
+    bid_cap = reserve + random_float() + 2
+    owner = product.owner
 
-    auc_obj = AuctionCreate(
-        product_id=prod_db.id,
-        starting_bid_amount=starting_bid_amount,
-        au_type=au_type,
+    return auction_repo.create(db, obj_in=AuctionCreate(
+        product_id=product.id,
+        owner_id=owner.id,
+        starting_amount=starting_amount,
         reserve=reserve,
         bid_cap=bid_cap
-    )
-    return crud_auction.create_with_owner(db, obj_in=auc_obj,
-                                          owner_id=owner_id, ending_date=ending_date)
+    ))

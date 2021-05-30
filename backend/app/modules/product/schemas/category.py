@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class CategoryBase(BaseModel):
     name: Optional[str]
+    description: Optional[str]
 
 
 class CategoryCreate(CategoryBase):

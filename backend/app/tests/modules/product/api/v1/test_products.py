@@ -1,47 +1,110 @@
-from random import randint
 from fastapi.testclient import TestClient
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.tests.utils.product import random_condition, get_categories
+
 from app.tests.utils.utils import random_lower_string
+from app.tests.utils.product import create_random_category, create_random_product
+
+from app.modules.product.repositories import product_repo
+from app.modules.product.schemas.product import ProductCreate
 
 
-def test_create_product(
-        client: TestClient, superuser_token_headers: dict, db: Session):
-    # name = random_lower_string()
-    # desc = random_lower_string()
-    # condition = random_condition()
-    # quantity = randint(1, 100)
-    # categories = get_categories(db)
-    # categories = [c.name for c in categories]
-    # data = {
-    #     "name": name,
-    #     "description": desc,
-    #     "condition": condition,
-    #     "quantity": quantity,
-    #     "categories": categories
-    # }
-    # response = client.post(f"{settings.API_PREFIX}/v1/products/", headers=superuser_token_headers,
-    #                        json=data)
+def test_create_product(client: TestClient, superuser_token_headers: dict, db: Session):
+    name = random_lower_string()
+    desc = random_lower_string()
+    data = {"name": name, "description": desc}
 
-    # assert response.status_code == 200
-    # content = response.json()
-    # assert content["name"] == name
-    # assert content["description"] == desc
-    # assert content["condition"] == condition
-    # assert content["quantity"] == quantity
-    # assert content["categories"] == categories
-    # assert "owner_id" in content
-    # assert "id" in content
-    pass
+    response = client.post(f"{settings.API_PREFIX}/v1/products/",
+                           headers=superuser_token_headers, json=data)
+
+    assert response.status_code == 201
+    content = response.json()
+
+    assert content["name"] == name
+    assert content["description"] == desc
 
 
-def test_get_product(): pass
-def test_update_product(): pass
-def test_delete_product(): pass
-def test_get_reserves(): pass
-def test_unreserve(): pass
-def test_update_inventory(): pass
-def test_add_categories(): pass
-def test_delete_categories(): pass
+def test_get_product(client: TestClient, db: Session):
+    name = random_lower_string()
+    desc = random_lower_string()
+
+    product = product_repo.create(db, obj_in=ProductCreate(
+        name=name, description=desc
+    ))
+
+    data = {"name": name, "description": desc}
+
+    response = client.get(f"{settings.API_PREFIX}/v1/products/{product.id}")
+
+    assert response.status_code == 200
+    content = response.json()
+
+    assert content["name"] == name
+    assert content["description"] == desc
+
+
+def test_update_product(client: TestClient, superuser_token_headers: dict, db: Session):
+    name = random_lower_string()
+    desc = random_lower_string()
+
+    product = product_repo.create(db, obj_in=ProductCreate(
+        name=name, description=desc
+    ))
+
+    new_name = random_lower_string()
+    new_desc = random_lower_string()
+    data = {"name": new_name, "description": new_desc}
+
+    response = client.put(f"{settings.API_PREFIX}/v1/products/{product.id}",
+                          headers=superuser_token_headers, json=data)
+
+    assert response.status_code == 200
+    content = response.json()
+
+    assert content["name"] == new_name
+    assert content["description"] == new_desc
+
+
+def test_delete_product(client: TestClient, superuser_token_headers: dict, db: Session):
+
+    name = random_lower_string()
+    desc = random_lower_string()
+
+    product = product_repo.create(db, obj_in=ProductCreate(
+        name=name, description=desc
+    ))
+
+    response = client.delete(f"{settings.API_PREFIX}/v1/products/{product.id}",
+                             headers=superuser_token_headers)
+
+    assert response.status_code == 200
+    content = response.json()
+
+    assert content["name"] == name
+    assert content["description"] == desc
+
+
+def test_add_category(client: TestClient, superuser_token_headers: dict, db: Session):
+    product = create_random_product(db)
+    cat1 = create_random_category(db)
+
+    data = cat1.id
+
+    response = client.post(f"{settings.API_PREFIX}/v1/products/{product.id}/categories",
+                           headers=superuser_token_headers, json=data)
+
+    assert response.status_code == 200
+    content = response.json()
+
+
+def test_remove_categories(client: TestClient, superuser_token_headers: dict, db: Session):
+    product = create_random_product(db)
+    cat1 = create_random_category(db)
+
+    response = client.delete(f"{settings.API_PREFIX}/v1/products/{product.id}/categories/{cat1.id}",
+                             headers=superuser_token_headers)
+
+    assert response.status_code == 200
+    content = response.json()

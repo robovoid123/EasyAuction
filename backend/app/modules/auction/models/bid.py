@@ -9,8 +9,8 @@ class Bid(Base):
     amount = sa.Column(sa.Float)
     created_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now())
 
-    session_id = sa.Column(sa.ForeignKey('auctionsession.id'))
+    auction_id = sa.Column(sa.ForeignKey('auction.id'))
     bidder_id = sa.Column(sa.ForeignKey('user.id'))
 
-    auction_session = relationship(
-        'AuctionSession', foreign_keys=[session_id], back_populates='bids')
+    auction = relationship(
+        'Auction', foreign_keys=[auction_id], back_populates='bids')

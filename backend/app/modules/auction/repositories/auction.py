@@ -1,3 +1,4 @@
+from app.modules.auction.models.auction_state import AuctionState
 from datetime import datetime
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
@@ -21,6 +22,12 @@ class AuctionRepository(BaseRepository[Auction, AuctionCreate, AuctionUpdate]):
                          obj_in: AuctionUpdate, ending_date: datetime) -> Auction:
         return self.update(db, db_obj=db_obj, obj_in={
             **obj_in.dict(exclude_unset=True), 'ending_date': ending_date})
+
+    def change_state(self, db: Session, db_obj: Auction, state: AuctionState):
+        db_obj.state = state
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
 
 
 auction_repo = AuctionRepository(Auction)

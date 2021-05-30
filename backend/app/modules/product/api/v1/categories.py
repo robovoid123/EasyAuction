@@ -10,7 +10,7 @@ from app.modules.product.repositories import category_repo
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("/", status_code=201)
 def create_category(*,
                     category_in: CategoryCreate,
                     db: Session = Depends(database.get_db),
