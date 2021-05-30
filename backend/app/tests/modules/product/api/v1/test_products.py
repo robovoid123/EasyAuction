@@ -24,6 +24,7 @@ def test_create_product(client: TestClient, superuser_token_headers: dict, db: S
 
     assert content["name"] == name
     assert content["description"] == desc
+    assert content["owner_id"]
 
 
 def test_get_product(client: TestClient, db: Session):
@@ -97,14 +98,22 @@ def test_add_category(client: TestClient, superuser_token_headers: dict, db: Ses
 
     assert response.status_code == 200
     content = response.json()
+    db.refresh(product)
+    assert cat1 in product.categories
 
 
 def test_remove_categories(client: TestClient, superuser_token_headers: dict, db: Session):
     product = create_random_product(db)
     cat1 = create_random_category(db)
 
+    product_repo.add_category(db, db_obj=product, category=cat1)
+    db.refresh(product)
+    assert cat1 in product.categories
+
     response = client.delete(f"{settings.API_PREFIX}/v1/products/{product.id}/categories/{cat1.id}",
                              headers=superuser_token_headers)
 
     assert response.status_code == 200
     content = response.json()
+    db.refresh(product)
+    assert cat1 not in product.categories

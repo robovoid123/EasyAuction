@@ -17,10 +17,10 @@ def create_random_auction(db: Session) -> Auction:
     bid_cap = reserve + random_float() + 2
     owner = product.owner
 
-    return auction_repo.create(db, obj_in=AuctionCreate(
+    return auction_repo.create_with_owner(db, obj_in=AuctionCreate(
         product_id=product.id,
         owner_id=owner.id,
         starting_amount=starting_amount,
         reserve=reserve,
         bid_cap=bid_cap
-    ))
+    ), owner_id=owner.id)

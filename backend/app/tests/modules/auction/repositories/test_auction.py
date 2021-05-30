@@ -16,11 +16,34 @@ def test_create_auction(db: Session):
 
     auction = auction_repo.create(db, obj_in=AuctionCreate(
         product_id=product.id,
-        owner_id=owner.id,
         starting_amount=starting_amount,
         reserve=reserve,
         bid_cap=bid_cap
     ))
+
+    db_obj = auction_repo.get(db, id=auction.id)
+
+    assert db_obj
+    assert db_obj.product_id == product.id
+    assert db_obj.starting_amount == starting_amount
+    assert db_obj.reserve == reserve
+    assert db_obj.bid_cap == bid_cap
+    assert db_obj.state == AuctionState.CREATED
+
+
+def test_create_auction(db: Session):
+    product = create_random_product(db)
+    starting_amount = random_float()
+    reserve = starting_amount + random_float()
+    bid_cap = reserve + random_float()
+    owner = product.owner
+
+    auction = auction_repo.create_with_owner(db, obj_in=AuctionCreate(
+        product_id=product.id,
+        starting_amount=starting_amount,
+        reserve=reserve,
+        bid_cap=bid_cap
+    ), owner_id=owner.id)
 
     db_obj = auction_repo.get(db, id=auction.id)
 

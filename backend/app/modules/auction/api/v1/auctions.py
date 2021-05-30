@@ -81,7 +81,7 @@ def update_auction(*, id: int,
     return auction_repo.update(db, db_obj=auction, obj_in=auction_in)
 
 
-@router.get("/{id}")
+@router.get("/{id}", response_model=AuctionInDB)
 def get_auction(*, id: int,
                 db: Session = Depends(get_db)):
     auction = auction_repo.get(db, id=id)
@@ -99,13 +99,12 @@ def delete_auction(*, id: int,
     return auction_repo.remove(db, id=id)
 
 
-@router.post("/")
+@router.post("/", status_code=201)
 def create_auction(*,
                    auction_in: AuctionCreate,
                    db: Session = Depends(get_db),
                    current_user: User = Depends(get_current_active_user)):
-    auction_in.owner_id = current_user.id
-    return auction_repo.create(db, obj_in=auction_in)
+    return auction_repo.create_with_owner(db, obj_in=auction_in, owner_id=current_user.id)
 
 
 @router.get("/")

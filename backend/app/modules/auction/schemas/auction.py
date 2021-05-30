@@ -11,7 +11,6 @@ class AuctionBase(BaseModel):
 
 class AuctionCreate(AuctionBase):
     product_id: int
-    owner_id: int
     starting_amount: float
 
 
@@ -23,6 +22,10 @@ class AuctionInDB(AuctionBase):
     id: Optional[int]
     owner_id: Optional[int]
     product_id: Optional[int]
+    state: Optional[str]
+    current_bid_amount: Optional[float]
+    last_bid_at: Optional[datetime]
+    final_winner_id: Optional[int]
 
     class Config:
         orm_mode = True

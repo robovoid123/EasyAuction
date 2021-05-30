@@ -17,7 +17,7 @@ def create_product(*,
                    product_in: ProductCreate,
                    db: Session = Depends(database.get_db),
                    current_user: User = Depends(auth.get_current_active_user)):
-    return product_repo.create(db, obj_in=product_in)
+    return product_repo.create_with_user(db, obj_in=product_in, owner_id=current_user.id)
 
 
 @router.get("/")

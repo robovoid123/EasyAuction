@@ -49,14 +49,15 @@ class EnglishAuction:
         db.refresh(db_obj)
         self.end(db, db_obj=db_obj)
 
-    def start(self, db: Session, db_obj: Auction):
+    def start(self, db: Session, db_obj: Auction) -> Auction:
         db_obj.current_bid_amount = db_obj.starting_amount
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         auction_repo.change_state(db, db_obj=db_obj, state=AuctionState.ONGOING)
+        return db_obj
 
-    def end(self, db: Session, db_obj: Auction):
+    def end(self, db: Session, db_obj: Auction) -> Auction:
         if db_obj.reserve and db_obj.current_bid_amount < db_obj.reserve:
             auction_repo.change_state(db, db_obj=db_obj, state=AuctionState.CANCLED)
         else:
@@ -66,6 +67,7 @@ class EnglishAuction:
                 db.commit()
                 db.refresh(db_obj)
             auction_repo.change_state(db, db_obj=db_obj, state=AuctionState.ENDED)
+        return db_obj
 
     def cancel(self, db: Session, db_obj: Auction):
         return auction_repo.change_state(db, db_obj=db_obj, state=AuctionState.CANCLED)

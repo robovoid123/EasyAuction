@@ -99,7 +99,7 @@ def test_cancel(db: Session):
     english.start(db, db_obj=auction)
     assert auction.state == AuctionState.ONGOING
 
-    amount = auction.starting_amount + random_float()
+    amount = auction.starting_amount + 1
     bidder = create_random_user(db)
     english.bid(db, db_obj=auction, amount=amount, bidder_id=bidder.id)
     db_obj = auction_repo.get(db, id=auction.id)
