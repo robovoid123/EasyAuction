@@ -1,3 +1,4 @@
+aiofiles==0.7.0
 alembic==1.5.8
 amqp==5.0.6
 APScheduler==3.7.0
@@ -31,6 +32,7 @@ MarkupSafe==1.1.1
 mccabe==0.6.1
 packaging==20.9
 passlib==1.7.4
+Pillow==8.2.0
 pluggy==0.13.1
 prompt-toolkit==3.0.18
 psycopg2-binary==2.8.6

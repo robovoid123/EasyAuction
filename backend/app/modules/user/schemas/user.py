@@ -1,3 +1,4 @@
+from app.modules.utils.schemas.image import ImageInDB
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr
@@ -21,6 +22,7 @@ class UserUpdate(UserBase):
 
 class UserInDB(UserBase):
     id: Optional[int] = None
+    profile_pic: Optional[ImageInDB]
 
     class Config:
         orm_mode = True

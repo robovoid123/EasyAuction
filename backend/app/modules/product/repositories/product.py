@@ -2,11 +2,13 @@ from typing import List
 
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy.sql.roles import DMLTableRole
 
 from app.repository.repository_base import BaseRepository
 
 from app.modules.product.schemas import ProductCreate, ProductUpdate
 from app.modules.product.models import Product, Category
+from app.modules.utils.models import Image
 
 
 class ProductRepository(BaseRepository[Product, ProductCreate, ProductUpdate]):
@@ -19,25 +21,49 @@ class ProductRepository(BaseRepository[Product, ProductCreate, ProductUpdate]):
         db.refresh(db_obj)
         return db_obj
 
+    def add_image(self, db: Session, db_obj: Product, image: Image) -> List[Image]:
+        db_obj.images.append(image)
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj.images
+
+    def add_images(self, db: Session, db_obj: Product, images: List[Image]) -> List[Image]:
+        db_obj.images = [*db_obj.images, *images]
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj.images
+
+    def remove_image(self, db: Session, db_obj: Product, image: Image):
+        db_obj.images = list(filter(lambda img: img.url != image.url, db_obj.images))
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+
     def add_category(self, db: Session, db_obj: Product,
                      category: Category) -> List[Category]:
-        temp = [*db_obj.categories, category]
+        db_obj.categories.append(category)
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return category
+
+    def add_categories(self, db: Session, db_obj: Product,
+                       categories: List[Category]) -> List[Category]:
+        temp = [*db_obj.categories, *categories]
         db_obj.categories = temp
+        print(db_obj.categories, categories)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return temp
 
     def remove_category(self, db: Session, db_obj: Product, category: Category):
-        temp = {c.id: c for c in db_obj.categories}
-        if temp.get(category.id):
-            del temp[category.id]
-        temp = [*temp.values()]
-        db_obj.categories = temp
+        db_obj.categories = list(filter(lambda c: c.id != category.id, db_obj.categories))
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
-        return temp
 
 
 product_repo = ProductRepository(Product)

@@ -22,6 +22,8 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     PROJECT_NAME: str
+    STATIC_PATH: str = "/backend/static"
+    STATIC_URL: str = "/static"
 
     POSTGRES_SERVER: str
     POSTGRES_USER: str

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.utils.schedule import sched
@@ -17,6 +18,9 @@ def create_app():
         openapi_url=f"{settings.API_PREFIX}/v1/openapi.json",
         version=1.0
     )
+
+    app.mount(settings.STATIC_URL, StaticFiles(
+        directory=settings.STATIC_PATH), name="static")
 
     # Set all CORS enabled origins
     if settings.BACKEND_CORS_ORIGINS:

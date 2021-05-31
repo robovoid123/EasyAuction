@@ -1,9 +1,7 @@
 from app.modules.user.models.user import User
-from decimal import DivisionByZero
 from app.modules.auction.auction.english_auction import EnglishAuction
-from typing import List
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status, Query, Body
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
 
 from app.dependencies.database import get_db
@@ -28,17 +26,18 @@ AUCTION_NOT_FOUND_EXCEPTION = HTTPException(
 router = APIRouter()
 
 
-@router.post("/{id}/start")
+@router.put("/{id}/start")
 def start_auction(*, id: int,
+                  starting_date: datetime = Body(None),
                   db: Session = Depends(get_db)):
     auction = auction_repo.get(db, id=id)
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION
     english = EnglishAuction()
-    return english.start(db, db_obj=auction)
+    return english.start(db, db_obj=auction, starting_date=starting_date)
 
 
-@router.post("/{id}/end")
+@router.put("/{id}/end")
 def end_auction(*, id: int,
                 db: Session = Depends(get_db)):
     auction = auction_repo.get(db, id=id)
@@ -74,11 +73,12 @@ def buy_it_now(*, id: int,
 @router.put("/{id}")
 def update_auction(*, id: int,
                    auction_in: AuctionUpdate,
+                   ending_date: datetime = Body(None),
                    db: Session = Depends(get_db)):
     auction = auction_repo.get(db, id=id)
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION
-    return auction_repo.update(db, db_obj=auction, obj_in=auction_in)
+    return auction_repo.update_with_date(db, db_obj=auction, obj_in=auction_in, ending_date=ending_date)
 
 
 @router.get("/{id}", response_model=AuctionInDB)
@@ -102,9 +102,10 @@ def delete_auction(*, id: int,
 @router.post("/", status_code=201)
 def create_auction(*,
                    auction_in: AuctionCreate,
+                   ending_date: datetime = Body(...),
                    db: Session = Depends(get_db),
                    current_user: User = Depends(get_current_active_user)):
-    return auction_repo.create_with_owner(db, obj_in=auction_in, owner_id=current_user.id)
+    return auction_repo.create_with_owner(db, obj_in=auction_in, owner_id=current_user.id, ending_date=ending_date)
 
 
 @router.get("/")

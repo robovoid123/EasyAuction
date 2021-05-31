@@ -1,3 +1,4 @@
+from app.modules.user.repositories.user import UserRepository
 from typing import Any, List
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
@@ -9,6 +10,8 @@ from app.dependencies import database, auth
 
 from app.modules.user.repositories import user_repo
 from app.modules.user.schemas import User, UserCreate, UserUpdate
+from app.modules.utils.api.dependencies import upload_image
+from app.modules.utils.models import Image
 
 router = APIRouter()
 
@@ -16,6 +19,7 @@ router = APIRouter()
 @router.post("/register", response_model=User)
 def register_user(
     *,
+    image: Image = Depends(upload_image),
     db: Session = Depends(database.get_db),
     password: str = Body(...),
     email: EmailStr = Body(...),
@@ -33,36 +37,18 @@ def register_user(
     user_in = UserCreate(
         password=password, email=email, full_name=full_name)
     user = user_repo.create(db, obj_in=user_in)
+    user_repo.add_profile_pic(db, db_obj=user, image=image)
     return user
 
 
-@router.get("/{usr_id}", response_model=User)
-def get_user(
-    usr_id: int,
-    db: Session = Depends(database.get_db)
-):
-    user = user_repo.get(db, id=usr_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="user not found"
-        )
-    return user
-
-
-@router.get("/", response_model=List[User])
-def read_users(
-    db: Session = Depends(database.get_db),
-    skip: int = 0,
-    limit: int = 100,
-    current_user: User = Depends(
-        auth.get_current_active_user),
-) -> Any:
-    """
-    Retrieve users.
-    """
-    users = user_repo.get_multi(db, skip=skip, limit=limit)
-    return users
+@router.post("/me/profile-pic")
+def add_profile_pic(*,
+                    image: Image = Depends(upload_image),
+                    db: Session = Depends(database.get_db),
+                    current_user: User = Depends(auth.get_current_active_user)):
+    user = user_repo.get(db, id=current_user.id)
+    user_repo.add_profile_pic(db, db_obj=user, image=image)
+    return {"url": image.url}
 
 
 @router.get("/me", response_model=User)
@@ -100,3 +86,32 @@ def update_user_me(
         user_in.email = email
     user = user_repo.update(db, db_obj=current_user, obj_in=user_in)
     return user
+
+
+@router.get("/{usr_id}", response_model=User)
+def get_user(
+    usr_id: int,
+    db: Session = Depends(database.get_db)
+):
+    user = user_repo.get(db, id=usr_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="user not found"
+        )
+    return user
+
+
+@router.get("/", response_model=List[User])
+def read_users(
+    db: Session = Depends(database.get_db),
+    skip: int = 0,
+    limit: int = 100,
+    current_user: User = Depends(
+        auth.get_current_active_user),
+) -> Any:
+    """
+    Retrieve users.
+    """
+    users = user_repo.get_multi(db, skip=skip, limit=limit)
+    return users

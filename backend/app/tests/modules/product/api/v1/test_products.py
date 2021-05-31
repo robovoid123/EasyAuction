@@ -14,7 +14,9 @@ from app.modules.product.schemas.product import ProductCreate
 def test_create_product(client: TestClient, superuser_token_headers: dict, db: Session):
     name = random_lower_string()
     desc = random_lower_string()
-    data = {"name": name, "description": desc}
+    cat1 = create_random_category(db)
+    data = {"product_in": {"name": name, "description": desc},
+            "categories": [cat1.name, cat1.name]}
 
     response = client.post(f"{settings.API_PREFIX}/v1/products/",
                            headers=superuser_token_headers, json=data)

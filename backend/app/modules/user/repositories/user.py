@@ -1,3 +1,4 @@
+from app.modules.utils.models.image import Image
 from app.repository.repository_base import BaseRepository
 from typing import Any, Dict, Optional, Union
 
@@ -50,6 +51,13 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
 
     def is_superuser(self, user: User) -> bool:
         return user.is_superuser
+
+    def add_profile_pic(self, db: Session, db_obj: User, image: Image):
+        db_obj.profile_pic = image
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj.profile_pic
 
 
 user_repo = UserRepository(User)

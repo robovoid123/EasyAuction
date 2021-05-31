@@ -5,6 +5,8 @@ from app.modules.auction.models.auction_state import AuctionState
 from app.modules.auction.models.auction import Auction
 from app.modules.auction.repositories import bid_repo, auction_repo
 from app.modules.auction.schemas.bid import BidCreate
+from app.utils.schedule import sched
+from app.db.session import SessionLocal
 
 INC_AMT = 1.25
 
@@ -13,6 +15,26 @@ INVALID_BID_EXCEPTION = HTTPException(status_code=400,
 
 
 class EnglishAuction:
+    @classmethod
+    def start_auction(cls, id: int):
+        try:
+            db = SessionLocal()
+            english = EnglishAuction()
+            auction = auction_repo.get(db, id=id)
+            english.start(db, db_obj=auction)
+        finally:
+            db.close()
+
+    @classmethod
+    def end_auction(cls, id: int):
+        try:
+            db = SessionLocal()
+            english = EnglishAuction()
+            auction = auction_repo.get(db, id=id)
+            english.end(db, db_obj=auction)
+        finally:
+            db.close()
+
     def is_valid_bid(self, db_obj: Auction, amount):
         return amount > db_obj.current_bid_amount
 
@@ -49,7 +71,25 @@ class EnglishAuction:
         db.refresh(db_obj)
         self.end(db, db_obj=db_obj)
 
-    def start(self, db: Session, db_obj: Auction) -> Auction:
+    def start(self, db: Session, db_obj: Auction, starting_date=None) -> Auction:
+        auction_id = db_obj.id
+        if starting_date:
+            # schedule start of auction
+            sched.add_job(
+                EnglishAuction.start_auction,
+                'date',
+                run_date=starting_date,
+                args=[auction_id]
+            )
+
+        # schedule ending
+        sched.add_job(
+            EnglishAuction.end_auction,
+            'date',
+            run_date=db_obj.ending_date,
+            args=[auction_id]
+        )
+
         db_obj.current_bid_amount = db_obj.starting_amount
         db.add(db_obj)
         db.commit()
