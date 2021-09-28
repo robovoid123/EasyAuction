@@ -1,0 +1,20 @@
+@use '../custom' as *;
+
+.heading-section {
+    margin-bottom: 4rem;
+}
+
+.login-bar {
+
+    padding: 0.4rem 0rem 0.6rem 2rem;
+    background-color: $white;
+
+    a {
+        text-decoration: none;
+        color: $black;
+
+        &:hover {
+            opacity: 65%;
+        }
+    }
+}

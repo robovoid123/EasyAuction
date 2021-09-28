@@ -29,7 +29,8 @@ router = APIRouter()
 @router.put("/{id}/start")
 def start_auction(*, id: int,
                   starting_date: datetime = Body(None),
-                  db: Session = Depends(get_db)):
+                  db: Session = Depends(get_db),
+                  current_user: User = Depends(get_current_active_user)):
     auction = auction_repo.get(db, id=id)
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION
@@ -39,7 +40,8 @@ def start_auction(*, id: int,
 
 @router.put("/{id}/end")
 def end_auction(*, id: int,
-                db: Session = Depends(get_db)):
+                db: Session = Depends(get_db),
+                current_user: User = Depends(get_current_active_user)):
     auction = auction_repo.get(db, id=id)
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION

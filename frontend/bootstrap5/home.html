@@ -9,86 +9,90 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
+
 <body class="bg-dark bg-opacity-10">
-    <div class="container-fluid">
-        <div class="">
-            <a href="">Login in</a> / <a href="">Register</a>
-        </div>
-    </div>
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark bg-dark py-3 mb-5">
-        <div class="container d-flex flex-column flex-sm-row">
-            <div class="mb-2 mb-sm-0">
-                <a class="navbar-brand ">Auction System</a>
+    <!-- Section: Heading -->
+    <section class='heading-section'>
+        <!-- Login Bar -->
+        <div class="container-fluid login-bar">
+            <div class="">
+                <a href="">Login in</a> / <a href="">Register</a>
             </div>
-            <form class="d-flex flex-grow-1 px-sm-4">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
         </div>
-    </nav>
+        <!-- Navbar -->
+        <nav class="navbar navbar-dark bg-dark py-4">
+            <div class="container d-flex flex-column flex-sm-row">
+                <div class="mb-2 mb-sm-0">
+                    <a class="navbar-brand ">Auction System</a>
+                </div>
+                <form class="d-flex flex-grow-1 px-sm-4">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
+    </section>
 
     <!-- Auction Item Showcase -->
     <section>
-        <div class="container mb-3">
+        <div class="container">
             <div class="row text-center">
-                <h4 class="fw-bold lead">Auction Showcase</h4>
+                <h4 class="fw-bold lead heading">Auction Showcase</h4>
+                <div class="heading-line mb-3"></div>
             </div>
         </div>
-        <div class="container  p-4">
-            <div class="row g-4">
-                <div class="col-12 col-md-4 col-lg-3">
-                    <div class="card">
-                        <img src="https://dummyimage.com/300x200/000/fff" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Product Name</h5>
-                            <p class="card-text">Lorem ipsum dolor sit amet.</p>
-                            <p class="card-text"><span>Current Bid Amount: </span>$100</p>
-                            <p class="card-text"><span>Ending Date: </span>9/18/2021 8:15 PM</p>
-                            <a href="#" class="btn btn-primary">BID Now</a>
+        <div class="container">
+            <div class="auction-items">
+                <div class="row g-4">
+                    <div class="col-12 col-md-4 col-lg-3 auction-item">
+                        <div class="card">
+                            <img src="https://dummyimage.com/300x200/000/fff" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">Product Name</h5>
+                                <p class="card-text">Lorem ipsum dolor sit amet.</p>
+                                <p class="card-text"><span>Current Bid Amount: </span>$100</p>
+                                <p class="card-text"><span>Ending Date: </span>9/18/2021 8:15 PM</p>
+                                <a href="#" class="btn btn-primary">BID Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <div class="card">
+                            <img src="https://dummyimage.com/300x200/000/fff" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">Product Name</h5>
+                                <p class="card-text">Lorem ipsum dolor sit amet.</p>
+                                <p class="card-text"><span>Current Bid Amount: </span>$100</p>
+                                <p class="card-text"><span>Ending Date: </span>9/18/2021 8:15 PM</p>
+                                <a href="#" class="btn btn-primary">BID Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <div class="card">
+                            <img src="https://dummyimage.com/300x200/000/fff" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">Product Name</h5>
+                                <p class="card-text">Lorem ipsum dolor sit amet.</p>
+                                <p class="card-text"><span>Current Bid Amount: </span>$100</p>
+                                <p class="card-text"><span>Ending Date: </span>9/18/2021 8:15 PM</p>
+                                <a href="#" class="btn btn-primary">BID Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <div class="card">
+                            <img src="https://dummyimage.com/300x200/000/fff" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">Product Name</h5>
+                                <p class="card-text">Lorem ipsum dolor sit amet.</p>
+                                <p class="card-text"><span>Current Bid Amount: </span>$100</p>
+                                <p class="card-text"><span>Ending Date: </span>9/18/2021 8:15 PM</p>
+                                <a href="#" class="btn btn-primary">BID Now</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-4 col-lg-3">
-                    <div class="card">
-                        <img src="https://dummyimage.com/300x200/000/fff" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Product Name</h5>
-                            <p class="card-text">Lorem ipsum dolor sit amet.</p>
-                            <p class="card-text"><span>Current Bid Amount: </span>$100</p>
-                            <p class="card-text"><span>Ending Date: </span>9/18/2021 8:15 PM</p>
-                            <a href="#" class="btn btn-primary">BID Now</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 col-lg-3">
-                    <div class="card">
-                        <img src="https://dummyimage.com/300x200/000/fff" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Product Name</h5>
-                            <p class="card-text">Lorem ipsum dolor sit amet.</p>
-                            <p class="card-text"><span>Current Bid Amount: </span>$100</p>
-                            <p class="card-text"><span>Ending Date: </span>9/18/2021 8:15 PM</p>
-                            <a href="#" class="btn btn-primary">BID Now</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 col-lg-3">
-                    <div class="card">
-                        <img src="https://dummyimage.com/300x200/000/fff" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Product Name</h5>
-                            <p class="card-text">Lorem ipsum dolor sit amet.</p>
-                            <p class="card-text"><span>Current Bid Amount: </span>$100</p>
-                            <p class="card-text"><span>Ending Date: </span>9/18/2021 8:15 PM</p>
-                            <a href="#" class="btn btn-primary">BID Now</a>
-                        </div>
-                    </div>
-                </div>
-
-
-
-
             </div>
         </div>
     </section>

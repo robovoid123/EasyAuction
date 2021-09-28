@@ -11113,5 +11113,124 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.heading-section {
+  margin-bottom: 4rem;
+}
+
+.login-bar {
+  padding: 0.4rem 0rem 0.6rem 2rem;
+  background-color: #fff;
+}
+.login-bar a {
+  text-decoration: none;
+  color: #000;
+}
+.login-bar a:hover {
+  opacity: 65%;
+}
+
+.bidding-section {
+  border: 2px solid grey;
+  padding: 1rem 2rem;
+  background-color: #f8f9fa;
+}
+
+.item-lead {
+  height: 20%;
+}
+
+.item-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.item-heading {
+  font-size: 2.2rem;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.auction-time {
+  font-size: 1.2rem;
+  color: grey;
+}
+
+.minimum-bid {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.bidding-input input, .bidding-input button {
+  margin-bottom: 1rem;
+}
+
+.current-bidders-bid {
+  color: #f8f9fa;
+  border-radius: 2rem;
+  background-color: grey;
+  padding: 0.2rem 0.4rem;
+  margin-right: 1rem;
+}
+
+.current-bidders-watching {
+  color: grey;
+}
+
+.more-item-info {
+  margin-top: 2rem;
+}
+.more-item-info h3 {
+  border-bottom: 1px solid grey;
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+}
+
+.current-bid-items div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 10rem;
+}
+.current-bid-items img {
+  height: 100%;
+  width: 100%;
+}
+
+.cb-img-div {
+  width: 14rem;
+}
+
+.cb-button-group button {
+  margin: 0 0.4rem;
+}
+
+.login-form {
+  max-width: 600px;
+  margin: auto;
+  margin-top: 20vh;
+}
+
+.heading-line::before {
+  content: "";
+  width: 10rem;
+  height: 0.1rem;
+  display: block;
+  margin: 0 auto;
+  background-color: grey;
+}
+
+.heading-line::after {
+  content: "";
+  width: 2rem;
+  padding-top: 0.5rem;
+  height: 0.2rem;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  background-color: grey;
+}
 
 /*# sourceMappingURL=style.css.map */

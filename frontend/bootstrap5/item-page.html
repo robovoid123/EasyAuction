@@ -9,30 +9,58 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark bg-dark py-3 mb-5">
-        <div class="container d-flex flex-column flex-sm-row">
-            <div class="mb-2 mb-sm-0">
-                <a class="navbar-brand ">Auction System</a>
+<body class="bg-dark bg-opacity-10">
+    <!-- Section: Heading -->
+    <section class='heading-section'>
+        <!-- Login Bar -->
+        <div class="container-fluid login-bar">
+            <div class="">
+                <a href="">Login in</a> / <a href="">Register</a>
             </div>
-            <form class="d-flex flex-grow-1 px-sm-4">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
         </div>
-    </nav>
+        <!-- Navbar -->
+        <nav class="navbar navbar-dark bg-dark py-4">
+            <div class="container d-flex flex-column flex-sm-row">
+                <div class="mb-2 mb-sm-0">
+                    <a class="navbar-brand ">Auction System</a>
+                </div>
+                <form class="d-flex flex-grow-1 px-sm-4">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
+    </section>
 
-    <!-- Auction Item -->
-    <section>
+    <!-- Section: Item Page Auction Item -->
+    <section class='item-page-auction-item'>
         <div class="container">
             <div class="row">
-                <div class="col-6">
-                    <img src="https://dummyimage.com/600x400/000/fff" class="img-thumbnail " alt="...">
+                <div class="col-lg-6 item-image">
+                    <img src="https://dummyimage.com/600x400/000/fff" class="img-fluid" alt="...">
                 </div>
-                <div class="col-auto">
-                    <h2>Item 1</h2>
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <h2 class='item-heading'>Item 1</h2>
+                    <p class="auction-time">1d 10h 19m 18s</p>
+                    <div class="bidding-section">
+                        <p class="minimum-bid">USD $288</p>
+                        <div class="bidding-input">
+                            <form action="">
+                                <input type="number" class="form-control" placeholder="$750" aria-label="Place Bid">
+                                <button class="btn btn-outline-success" type="submit">Place Bid</button>
+                            </form>
+                        </div>
+                        <p class="current-bidders-info">
+                            <span class="current-bidders-bid">16 bids</span>
+                            <span class="current-bidders-watching"> 26 bidders are watching this items</span>
+                        </p>
+                    </div>
                 </div>
+            </div>
+            <div class="more-item-info">
+                <h3>DESCRIPTION</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus optio numquam veritatis nam obcaecati
+                    doloremque assumenda accusamus facilis reprehenderit illum!</p>
             </div>
         </div>
     </section>
