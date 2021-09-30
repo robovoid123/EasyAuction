@@ -3,6 +3,7 @@ from app.modules.auction.auction.english_auction import EnglishAuction
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
+from typing import List
 
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_active_user
@@ -110,7 +111,7 @@ def create_auction(*,
     return auction_repo.create_with_owner(db, obj_in=auction_in, owner_id=current_user.id, ending_date=ending_date)
 
 
-@router.get("/")
+@router.get("/", response_model=List[AuctionInDB])
 def get_auctions(*,
                  skip: int = 0,
                  limit: int = 5,

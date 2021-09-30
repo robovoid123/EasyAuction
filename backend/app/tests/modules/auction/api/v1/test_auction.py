@@ -56,7 +56,7 @@ def test_get_auction(client: TestClient, superuser_token_headers: dict, db: Sess
     assert content["starting_amount"] == auction.starting_amount
     assert content["reserve"] == auction.reserve
     assert content["bid_cap"] == auction.bid_cap
-    assert content["product_id"] == auction.product_id
+    assert content["product"]
 
 
 def test_start_auction(
