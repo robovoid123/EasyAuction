@@ -32,7 +32,13 @@ const Signup = () => {
         const data = await response.json()
 
         if (!response.ok) {
-            setErrorMessage(data.detail[""])
+            let responseErrorMessage = data.detail
+            // if error message from backend is a string then only set ErrorMessage
+            // TODO: error message which are object need to be handled seperately
+            if (typeof (responseErrorMessage) !== 'string') {
+                responseErrorMessage = ''
+            }
+            setErrorMessage(responseErrorMessage)
         } else {
             setToken(data.access_token)
         }
@@ -43,7 +49,6 @@ const Signup = () => {
         if (password.length > 8 && image != null) {
             submitRegistration()
         } else {
-            console.log(password, image, typeof (image))
             setErrorMessage(
                 "Ensure the password is greate than 8 character and profile pic is uploaded"
             )
