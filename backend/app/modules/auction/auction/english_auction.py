@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.modules.auction.models.auction_state import AuctionState
@@ -49,6 +49,7 @@ class EnglishAuction:
         db_obj.bids.append(new_bid)
         db_obj.last_bid_at = datetime.now()
         db_obj.winning_bid_id = new_bid.id
+        db_obj.bid_count += 1
 
         if db_obj.bid_cap and amount >= db_obj.bid_cap:
             db_obj.current_bid_amount = db_obj.bid_cap
@@ -81,17 +82,19 @@ class EnglishAuction:
                 run_date=starting_date,
                 args=[auction_id]
             )
+            db_obj.starting_date = starting_date
+        else:
+            db_obj.starting_date = datetime.now()
 
         # schedule ending
         sched.add_job(
             EnglishAuction.end_auction,
             'date',
-            run_date=db_obj.ending_date,
+            run_date=ending_date,
             args=[auction_id]
         )
 
         db_obj.current_bid_amount = db_obj.starting_amount
-        db_obj.starting_date = starting_date
         db_obj.ending_date = ending_date
         db.add(db_obj)
         db.commit()

@@ -16,6 +16,7 @@ class Auction(Base):
     state = sa.Column(sa.String, index=True, default=AuctionState.CREATED.value)
     current_bid_amount = sa.Column(sa.Float)
     last_bid_at = sa.Column(sa.DateTime)
+    bid_count = sa.Column(sa.Integer, default=0)
 
     ending_date = sa.Column(sa.DateTime)  # for scheduler to end auction
     starting_date = sa.Column(sa.DateTime)  # for scheduler to start auction

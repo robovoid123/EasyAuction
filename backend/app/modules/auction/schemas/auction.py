@@ -28,7 +28,9 @@ class AuctionInDB(AuctionBase):
     current_bid_amount: Optional[float]
     last_bid_at: Optional[datetime]
     final_winner_id: Optional[int]
+    starting_date: Optional[datetime]
     ending_date: Optional[datetime]
+    bid_count: Optional[int]
 
     class Config:
         orm_mode = True
