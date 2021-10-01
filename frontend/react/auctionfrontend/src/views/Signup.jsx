@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import { ErrorMessage } from "../components/ErrorMessage";
 
@@ -11,11 +11,20 @@ const Signup = () => {
     const [, setToken] = useContext(UserContext)
 
     const submitRegistration = async () => {
-        console.log(JSON.stringify({'password': password, 'email': email, 'full_name': fullname}))
+
+        const formData = new FormData()
+        const headers = {}
+        formData.append('password', password)
+        formData.append('email', email)
+        formData.append('full_name', fullname)
+        formData.append('image', image)
+
+        headers.Accept = 'application/json'
+
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({'password': password, 'email': email, 'full_name': fullname}),
+            headers,
+            body: formData,
             mode: 'cors',
         }
 
@@ -31,9 +40,10 @@ const Signup = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        if (password.length > 8 && image != null){
+        if (password.length > 8 && image != null) {
             submitRegistration()
         } else {
+            console.log(password, image, typeof (image))
             setErrorMessage(
                 "Ensure the password is greate than 8 character and profile pic is uploaded"
             )
@@ -51,7 +61,7 @@ const Signup = () => {
                         <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
                             <form style={{ width: "23rem" }} onSubmit={handleSubmit}>
                                 <h3 className="fw-normal mb-3 pb-3" style={{ letterSpacing: "1px" }}>Signup</h3>
-                                
+
                                 <div className="form-outline mb-4">
                                     <input type="username" className="form-control form-control-lg" placeholder="Full Name" value={fullname} onChange={(e) => setFullname(e.target.value)} />
                                 </div>
@@ -62,6 +72,10 @@ const Signup = () => {
 
                                 <div className="form-outline mb-4">
                                     <input type="password" className="form-control form-control-lg" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                </div>
+
+                                <div className="form-outline mb-4">
+                                    <input type="file" className="form-control form-control-lg" onChange={(e) => setImage(e.target.files[0])} />
                                 </div>
 
                                 <ErrorMessage message={errorMessage} />
