@@ -1,11 +1,10 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import SearchNav from "./SearchNav"
 import { UserContext } from "../context/UserContext"
 
 const Nav = () => {
     const [token, setToken] = useContext(UserContext)
 
-    console.log(token)
 
     const handleLogout = () => {
         setToken(null)
@@ -29,14 +28,13 @@ const Nav = () => {
                     </ul>
                     <div className="navbar-nav">
                         <SearchNav />
-                        {!token ? (
+                        {token === 'null' || !token ? (
                             <>
                                 <a href="login" className="btn btn-link px-3 me-2 nav-link">Login</a>
                                 <a href="signup" className="btn btn-info me-3 nav-link text-light">Sign up</a>
                             </>
                         ) : (
                             <>
-                                {console.log(token)}
                                 <button className="btn btn-info nav-link text-light mx-2" onClick={handleLogout}>Logout</button>
                             </>
                         )}

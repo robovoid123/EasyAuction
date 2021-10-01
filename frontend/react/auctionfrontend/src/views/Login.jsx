@@ -1,4 +1,4 @@
-import React, {useState, useContext} from "react"
+import React, { useState, useContext } from "react"
 
 import { ErrorMessage } from '../components/ErrorMessage'
 import { UserContext } from '../context/UserContext'
@@ -12,7 +12,7 @@ const Login = () => {
     const submitLogin = async () => {
         const requestOptions = {
             method: 'POST',
-            headers: { "Content-Type": "application/x-www-form-urlencoded"},
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: JSON.stringify(
                 `grant_type=&username=${email}&password=${password}&scope=&client_id=&client_secret=`
             ),

@@ -7,23 +7,23 @@ export const UserProvider = (props) => {
 
   useEffect(() => {
     // const fetchUser = async () => {
-      // const requestOptions = {
-        // method: "GET",
-        // headers: {
-          // "Content-Type": "application/json",
-          // Authorization: "Bearer " + token,
-        // },
-        // mode: "cors",
-      // };
+    // const requestOptions = {
+    // method: "GET",
+    // headers: {
+    // "Content-Type": "application/json",
+    // Authorization: "Bearer " + token,
+    // },
+    // mode: "cors",
+    // };
 
-      // const response = await fetch("/api/v1/auth/access-token", requestOptions);
+    // const response = await fetch("/api/v1/auth/access-token", requestOptions);
 
-      // if (!response.ok) {
-      //   setToken(null);
-      // }
+    // if (!response.ok) {
+    //   setToken(null);
+    // }
     // };
     localStorage.setItem("userLoginToken", token);
-    
+
   }, [token]);
 
   return (
