@@ -23,6 +23,7 @@ def register_user(
     password: str = Body(...),
     email: EmailStr = Body(...),
     full_name: str = Body(...),
+    image: Image = Depends(upload_image)
 ) -> Any:
     """
     Create new user.
@@ -36,6 +37,7 @@ def register_user(
     user_in = UserCreate(
         password=password, email=email, full_name=full_name)
     user = user_repo.create(db, obj_in=user_in)
+    user_repo.add_profile_pic(db, db_obj=user, image=image)
     return user
 
 
