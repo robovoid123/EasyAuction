@@ -6,9 +6,17 @@ from fastapi.encoders import jsonable_encoder
 from app.modules.auction.schemas import AuctionCreate, AuctionUpdate
 from app.modules.auction.models import Auction
 from app.repository.repository_base import BaseRepository
+from app.modules.product.models.product import Product
 
 
 class AuctionRepository(BaseRepository[Auction, AuctionCreate, AuctionUpdate]):
+
+    def get_multi(self, db: Session, *, skip: int = 0, limit: int = 100, like: str = None):
+        auctions = db.query(self.model).join(Product)
+        if like:
+            auctions = auctions.filter(Product.name.like('%' + like + '%'))
+        return auctions.offset(skip).limit(limit).all()
+
     def create_with_owner(self, db: Session, obj_in: AuctionCreate, owner_id: int, ending_date: datetime = None) -> Auction:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data, owner_id=owner_id,

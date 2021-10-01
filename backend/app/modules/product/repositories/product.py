@@ -53,7 +53,6 @@ class ProductRepository(BaseRepository[Product, ProductCreate, ProductUpdate]):
                        categories: List[Category]) -> List[Category]:
         temp = [*db_obj.categories, *categories]
         db_obj.categories = temp
-        print(db_obj.categories, categories)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

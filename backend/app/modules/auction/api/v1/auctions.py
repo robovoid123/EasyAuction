@@ -3,7 +3,7 @@ from app.modules.auction.auction.english_auction import EnglishAuction
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_active_user
@@ -115,5 +115,7 @@ def create_auction(*,
 def get_auctions(*,
                  skip: int = 0,
                  limit: int = 5,
+                 like: Optional[str] = None,
+                 filter_by: Optional[str] = None,
                  db: Session = Depends(get_db)):
-    return auction_repo.get_multi(db, skip=skip, limit=limit)
+    return auction_repo.get_multi(db, skip=skip, limit=limit, like=like)
