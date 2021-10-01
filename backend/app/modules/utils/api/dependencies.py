@@ -25,10 +25,11 @@ def compress(filepath: str, size: int = 600):
     img.save(filepath, "JPEG")
 
 
-async def upload_image(db: Session = Depends(database.get_db), image: UploadFile = File(...)) -> Image:
+async def upload_image(db: Session = Depends(database.get_db), image: UploadFile = File(None)) -> Image:
     """
     upload image and store image url in database
     """
+    if not image: return None
     _, f_ext = os.path.splitext(image.filename)
     filename = str(uuid4()) + f_ext
 

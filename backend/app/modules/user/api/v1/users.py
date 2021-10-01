@@ -19,11 +19,10 @@ router = APIRouter()
 @router.post("/register", response_model=User)
 def register_user(
     *,
-    image: Image = Depends(upload_image),
     db: Session = Depends(database.get_db),
     password: str = Body(...),
     email: EmailStr = Body(...),
-    full_name: str = Body(None),
+    full_name: str = Body(...),
 ) -> Any:
     """
     Create new user.
@@ -37,7 +36,6 @@ def register_user(
     user_in = UserCreate(
         password=password, email=email, full_name=full_name)
     user = user_repo.create(db, obj_in=user_in)
-    user_repo.add_profile_pic(db, db_obj=user, image=image)
     return user
 
 
