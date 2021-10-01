@@ -1,6 +1,16 @@
+import React, { useContext } from "react"
 import SearchNav from "./SearchNav"
+import { UserContext } from "../context/UserContext"
 
 const Nav = () => {
+    const [token, setToken] = useContext(UserContext)
+
+    console.log(token)
+
+    const handleLogout = () => {
+        setToken(null)
+    }
+
     return (
         <nav className="navbar navbar-expand-md navbar-light bg-light">
             <div className="container">
@@ -19,8 +29,17 @@ const Nav = () => {
                     </ul>
                     <div className="navbar-nav">
                         <SearchNav />
-                        <a href="login" className="btn btn-link px-3 me-2 nav-link">Login</a>
-                        <a href="signup" className="btn btn-info me-3 nav-link text-light">Sign up</a>
+                        {!token ? (
+                            <>
+                                <a href="login" className="btn btn-link px-3 me-2 nav-link">Login</a>
+                                <a href="signup" className="btn btn-info me-3 nav-link text-light">Sign up</a>
+                            </>
+                        ) : (
+                            <>
+                                {console.log(token)}
+                                <button className="btn btn-info nav-link text-light mx-2" onClick={handleLogout}>Logout</button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
