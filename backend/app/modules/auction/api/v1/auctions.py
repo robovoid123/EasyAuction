@@ -30,13 +30,14 @@ router = APIRouter()
 @router.put("/{id}/start")
 def start_auction(*, id: int,
                   starting_date: datetime = Body(None),
+                  ending_date: datetime = Body(...),
                   db: Session = Depends(get_db),
                   current_user: User = Depends(get_current_active_user)):
     auction = auction_repo.get(db, id=id)
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION
     english = EnglishAuction()
-    return english.start(db, db_obj=auction, starting_date=starting_date)
+    return english.start(db, db_obj=auction, starting_date=starting_date, ending_date=ending_date)
 
 
 @router.put("/{id}/end")
@@ -105,10 +106,9 @@ def delete_auction(*, id: int,
 @router.post("/", status_code=201)
 def create_auction(*,
                    auction_in: AuctionCreate,
-                   ending_date: datetime = Body(...),
                    db: Session = Depends(get_db),
                    current_user: User = Depends(get_current_active_user)):
-    return auction_repo.create_with_owner(db, obj_in=auction_in, owner_id=current_user.id, ending_date=ending_date)
+    return auction_repo.create_with_owner(db, obj_in=auction_in, owner_id=current_user.id)
 
 
 @router.get("/", response_model=List[AuctionInDB])
@@ -116,6 +116,5 @@ def get_auctions(*,
                  skip: int = 0,
                  limit: int = 5,
                  like: Optional[str] = None,
-                 filter_by: Optional[str] = None,
                  db: Session = Depends(get_db)):
     return auction_repo.get_multi(db, skip=skip, limit=limit, like=like)

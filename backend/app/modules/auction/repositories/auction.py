@@ -17,10 +17,9 @@ class AuctionRepository(BaseRepository[Auction, AuctionCreate, AuctionUpdate]):
             auctions = auctions.filter(Product.name.like('%' + like + '%'))
         return auctions.offset(skip).limit(limit).all()
 
-    def create_with_owner(self, db: Session, obj_in: AuctionCreate, owner_id: int, ending_date: datetime = None) -> Auction:
+    def create_with_owner(self, db: Session, obj_in: AuctionCreate, owner_id: int) -> Auction:
         obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data, owner_id=owner_id,
-                            ending_date=ending_date)  # type: ignore
+        db_obj = self.model(**obj_in_data, owner_id=owner_id)  # type: ignore
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

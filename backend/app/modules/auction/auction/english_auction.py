@@ -71,7 +71,7 @@ class EnglishAuction:
         db.refresh(db_obj)
         self.end(db, db_obj=db_obj)
 
-    def start(self, db: Session, db_obj: Auction, starting_date=None) -> Auction:
+    def start(self, db: Session, db_obj: Auction, ending_date, starting_date=None) -> Auction:
         auction_id = db_obj.id
         if starting_date:
             # schedule start of auction
@@ -91,6 +91,8 @@ class EnglishAuction:
         )
 
         db_obj.current_bid_amount = db_obj.starting_amount
+        db_obj.starting_date = starting_date
+        db_obj.ending_date = ending_date
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
