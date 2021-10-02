@@ -119,3 +119,7 @@ def test_remove_categories(client: TestClient, superuser_token_headers: dict, db
     content = response.json()
     db.refresh(product)
     assert cat1 not in product.categories
+
+
+def test_get_user_products(client: TestClient, superuser_token_headers: dict, db: Session):
+    assert False

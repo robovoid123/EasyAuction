@@ -1,6 +1,7 @@
 from app.modules.user.models.user import User
 from app.modules.auction.auction.english_auction import EnglishAuction
 from datetime import datetime
+from app.modules.auction.models.auction_state import AuctionState
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -22,6 +23,11 @@ OWNER_ONLY_EXCEPTION = HTTPException(
 AUCTION_NOT_FOUND_EXCEPTION = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail='auction not found'
+)
+
+AUCTION_NOT_STARTED_EXCEPTION = HTTPException(
+    status_code=400,
+    detail='auction not started'
 )
 
 router = APIRouter()
@@ -59,6 +65,10 @@ def bid_in_auction(*, id: int,
     auction = auction_repo.get(db, id=id)
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION
+
+    if auction.state is not AuctionState.ONGOING:
+        raise AUCTION_NOT_STARTED_EXCEPTION
+
     english = EnglishAuction()
     return english.bid(db, db_obj=auction, amount=amount, bidder_id=current_user.id)
 
