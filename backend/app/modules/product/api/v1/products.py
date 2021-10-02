@@ -66,6 +66,15 @@ def get_products(*,
     return product_repo.get_multi(db, skip=skip, limit=limit)
 
 
+@router.get("/user/{user_id}")
+def get_user_products(*,
+                      user_id: int,
+                      skip: int = 0,
+                      limit: int = 5,
+                      db: Session = Depends(database.get_db)):
+    return product_repo.get_multi_by_user(db, user_id=user_id, skip=skip, limit=limit)
+
+
 @router.put("/{id}")
 def update_product(*, id: int,
                    product_in: ProductUpdate,
