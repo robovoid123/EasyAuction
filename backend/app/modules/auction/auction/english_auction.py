@@ -14,6 +14,12 @@ INVALID_BID_EXCEPTION = HTTPException(status_code=400,
                                       detail="invalid bid")
 
 
+AUCTION_NOT_STARTED_EXCEPTION = HTTPException(
+    status_code=400,
+    detail='auction not started'
+)
+
+
 class EnglishAuction:
     @classmethod
     def start_auction(cls, id: int):
@@ -41,6 +47,9 @@ class EnglishAuction:
     def bid(self, db: Session, db_obj: Auction, amount: float, bidder_id: int):
         if not self.is_valid_bid(db_obj=db_obj, amount=amount):
             raise INVALID_BID_EXCEPTION
+
+        if db_obj.state is not AuctionState.ONGOING:
+            raise AUCTION_NOT_STARTED_EXCEPTION
 
         new_bid = bid_repo.create(db, obj_in=BidCreate(
             amount=amount,
