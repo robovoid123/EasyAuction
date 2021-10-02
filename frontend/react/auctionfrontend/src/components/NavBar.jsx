@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext } from "react"
 import SearchNav from "./SearchNav"
 import { UserContext } from "../context/UserContext"
 
@@ -35,6 +35,7 @@ const Nav = () => {
                             </>
                         ) : (
                             <>
+                                <a href="product" className="btn btn-info nav-link text-light ms-2">Product Management</a>
                                 <button className="btn btn-info nav-link text-light mx-2" onClick={handleLogout}>Logout</button>
                             </>
                         )}
