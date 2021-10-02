@@ -1,4 +1,5 @@
 from decimal import DivisionByZero
+from datetime import datetime, timedelta
 from app.modules.auction.models.auction_state import AuctionState
 from sqlalchemy.orm import Session, session
 
@@ -15,7 +16,8 @@ def test_start(db: Session):
     assert auction.state == AuctionState.CREATED
 
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
 
     auction = auction_repo.get(db, id=auction.id)
     assert auction.state == AuctionState.ONGOING
@@ -24,7 +26,8 @@ def test_start(db: Session):
 def test_bid(db: Session):
     auction = create_random_auction(db)
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
     assert auction.state == AuctionState.ONGOING
 
     amount = auction.starting_amount + 1
@@ -41,7 +44,8 @@ def test_bid(db: Session):
 def test_bid_bid_cap(db: Session):
     auction = create_random_auction(db)
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
     assert auction.state == AuctionState.ONGOING
 
     amount = auction.bid_cap
@@ -60,7 +64,8 @@ def test_bid_bid_cap(db: Session):
 def test_end(db: Session):
     auction = create_random_auction(db)
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
     assert auction.state == AuctionState.ONGOING
 
     amount = auction.reserve + random_float()
@@ -78,7 +83,8 @@ def test_end(db: Session):
 def test_end_when_reserve_not_met(db: Session):
     auction = create_random_auction(db)
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
     assert auction.state == AuctionState.ONGOING
 
     amount = auction.current_bid_amount + 2
@@ -96,7 +102,8 @@ def test_end_when_reserve_not_met(db: Session):
 def test_cancel(db: Session):
     auction = create_random_auction(db)
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
     assert auction.state == AuctionState.ONGOING
 
     amount = auction.starting_amount + 1
@@ -114,7 +121,8 @@ def test_cancel(db: Session):
 def test_buy_it_now(db: Session):
     auction = create_random_auction(db)
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
     assert auction.state == AuctionState.ONGOING
 
     buyer = create_random_user(db)

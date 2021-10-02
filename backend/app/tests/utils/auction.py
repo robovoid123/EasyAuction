@@ -17,7 +17,6 @@ def create_random_auction(db: Session) -> Auction:
     reserve = starting_amount + random_float() + 2
     bid_cap = reserve + random_float() + 2
     owner = product.owner
-    ending_date = (datetime.now() + timedelta(days=1))
 
     return auction_repo.create_with_owner(db, obj_in=AuctionCreate(
         product_id=product.id,
@@ -25,4 +24,4 @@ def create_random_auction(db: Session) -> Auction:
         starting_amount=starting_amount,
         reserve=reserve,
         bid_cap=bid_cap
-    ), owner_id=owner.id, ending_date=ending_date)
+    ), owner_id=owner.id)

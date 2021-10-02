@@ -20,18 +20,16 @@ def test_create_auction(
     starting_amount = random_float()
     reserve = starting_amount + 2 + random_float()
     bid_cap = reserve + 2 + random_float()
-    data = {'auction_in': {
+    data = {
         'starting_amount': starting_amount,
         'reserve': reserve,
         'bid_cap': bid_cap,
         'product_id': product.id
-    },
-        "ending_date": (datetime.now() + timedelta(days=1)).isoformat()}
+    }
 
     response = client.post(f"{settings.API_PREFIX}/v1/auctions/",
                            headers=superuser_token_headers, json=data)
 
-    print("Response: ", response.json())
     assert response.status_code == 201
     content = response.json()
 
@@ -62,9 +60,11 @@ def test_get_auction(client: TestClient, superuser_token_headers: dict, db: Sess
 def test_start_auction(
         client: TestClient, superuser_token_headers: dict, db: Session):
     auction = create_random_auction(db)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    data = {'ending_date': ending_date}
 
     response = client.put(f"{settings.API_PREFIX}/v1/auctions/{auction.id}/start",
-                          headers=superuser_token_headers)
+                          headers=superuser_token_headers, json=data)
 
     assert response.status_code == 200
     content = response.json()
@@ -84,7 +84,8 @@ def test_end_auction(client: TestClient, superuser_token_headers: dict, db: Sess
     amount = auction.reserve + random_float()
     bidder = create_random_user(db)
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
     english.bid(db, db_obj=auction, amount=amount, bidder_id=bidder.id)
 
     response = client.put(f"{settings.API_PREFIX}/v1/auctions/{auction.id}/end",
@@ -107,7 +108,8 @@ def test_bid_auction(client: TestClient, superuser_token_headers: dict, db: Sess
     auction = create_random_auction(db)
     amount = auction.reserve + random_float()
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
     data = amount
 
     response = client.post(f"{settings.API_PREFIX}/v1/auctions/{auction.id}/bid",
@@ -123,7 +125,8 @@ def test_bid_auction(client: TestClient, superuser_token_headers: dict, db: Sess
 def test_buy_it_now(client: TestClient, superuser_token_headers: dict, db: Session):
     auction = create_random_auction(db)
     english = EnglishAuction()
-    english.start(db, db_obj=auction)
+    ending_date = (datetime.now() + timedelta(days=1)).isoformat()
+    english.start(db, db_obj=auction, ending_date=ending_date)
 
     response = client.post(f"{settings.API_PREFIX}/v1/auctions/{auction.id}/buy_it_now",
                            headers=superuser_token_headers)
