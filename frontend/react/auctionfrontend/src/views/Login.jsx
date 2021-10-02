@@ -3,7 +3,7 @@ import React, { useState, useContext } from "react"
 import { ErrorMessage } from '../components/ErrorMessage'
 import { UserContext } from '../context/UserContext'
 
-const Login = () => {
+const Login = props => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
@@ -32,6 +32,7 @@ const Login = () => {
             setErrorMessage(responseErrorMessage)
         } else {
             setToken(data.access_token)
+            props.history.push('/')
         }
     }
 

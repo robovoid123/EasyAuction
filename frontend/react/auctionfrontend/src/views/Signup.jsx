@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import { ErrorMessage } from "../components/ErrorMessage";
 
-const Signup = () => {
+const Signup = props => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [fullname, setFullname] = useState("")
@@ -41,6 +41,7 @@ const Signup = () => {
             setErrorMessage(responseErrorMessage)
         } else {
             setToken(data.access_token)
+            props.history.push("login")
         }
     }
 

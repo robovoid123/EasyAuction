@@ -1,16 +1,28 @@
-import React, { useState, useContext } from "react";
-import { ErrorMessage } from "../components/ErrorMessage";
+import React, { useEffect, useState, useContext } from 'react'
+import { ErrorMessage } from '../components/ErrorMessage'
 import { UserContext } from "../context/UserContext";
+import { Redirect } from 'react-router-dom';
 
-const ProductAdd = props => {
+export const ProductUpdate = props => {
+    const [ product, setProduct] = useState([])
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
     const [token,] = useContext(UserContext)
 
-    const submitProductAdd = async () => {
+    var id = props.location.state
+
+    useEffect(() => {
+        fetch(`/api/v1/products/${id}`, {mode: 'cors'})
+        .then((response) => response.json())
+        .then((json) => {
+            setProduct(json)
+        })
+    }, [id])
+
+    const submitProductUpdate = async () => {
         const requestOptions = {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
                 Authorization: "bearer " + token,
@@ -18,16 +30,13 @@ const ProductAdd = props => {
             body: JSON.stringify({
                 product_in: {
                     name: name,
-                    description: description
+                    description: description,
                 },
-                categories: [
-                    "a"
-                ]
             }),
             mode: 'cors',
         }
 
-        const response = await fetch("/api/v1/products", requestOptions)
+        const response = await fetch(`/api/v1/products/${id}`, requestOptions)
         const data = await response.json()
 
         if (!response.ok) {
@@ -38,14 +47,14 @@ const ProductAdd = props => {
                 responseErrorMessage = ''
             }
             setErrorMessage(responseErrorMessage)
-        } else {
-            props.history.push('product')
+        } else{
+            return <Redirect to="product"></Redirect>
         }
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        submitProductAdd()
+        submitProductUpdate()
     }
 
     return (
@@ -55,20 +64,20 @@ const ProductAdd = props => {
                     <div className="col-sm-6 text-black">
                         <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
                             <form style={{ width: "23rem" }} onSubmit={handleSubmit}>
-                                <h3 className="fw-normal mb-3 pb-3" style={{ letterSpacing: "1px" }}>Add Product</h3>
+                                <h3 className="fw-normal mb-3 pb-3" style={{ letterSpacing: "1px" }}>Update Product</h3>
 
                                 <div className="form-outline mb-4">
-                                    <input type="text" className="form-control form-control-lg" placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} required />
+                                    <input type="text" className="form-control form-control-lg" placeholder={product.name} value={name} onChange={(e) => setName(e.target.value)} />
                                 </div>
 
                                 <div className="form-outline mb-4">
-                                    <input type="text" className="form-control form-control-lg" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
+                                    <input type="text" className="form-control form-control-lg" placeholder={product.description} value={description} onChange={(e) => setDescription(e.target.value)}/>
                                 </div>
 
                                 <ErrorMessage message={errorMessage} />
 
                                 <div className="pt-1 mt-3 mb-4">
-                                    <button className="btn btn-info btn-lg btn-block text-light" type="submit">Create Product</button>
+                                    <button className="btn btn-info btn-lg btn-block text-light" type="submit">Update Product</button>
                                 </div>
                             </form>
                         </div>
@@ -78,5 +87,3 @@ const ProductAdd = props => {
         </section>
     )
 }
-
-export default ProductAdd
