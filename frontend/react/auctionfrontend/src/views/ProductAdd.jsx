@@ -5,6 +5,7 @@ import { UserContext } from "../context/UserContext";
 const ProductAdd = props => {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
+    const [image, setImage] = useState(null)
     const [errorMessage, setErrorMessage] = useState("")
     const {token} = useContext(UserContext)
 
@@ -41,6 +42,22 @@ const ProductAdd = props => {
         } else {
             props.history.push('product')
         }
+
+        // uploading image
+        const imageData = new FormData()
+        imageData.append('image', image)
+
+        const requestOptionsForImage = {
+            method: 'POST',
+            headers: {
+                Authorization: "bearer " + token,
+            },
+            body: imageData,
+            mode: 'cors',
+        }
+
+        const responseImage = await fetch(`api/v1/products/${data.id}/images`, requestOptionsForImage)
+        const imageResponse = await responseImage.json()
     }
 
     const handleSubmit = (e) => {
@@ -63,6 +80,10 @@ const ProductAdd = props => {
 
                                 <div className="form-outline mb-4">
                                     <input type="text" className="form-control form-control-lg" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
+                                </div>
+
+                                <div className="form-outline mb-4">
+                                    <input type="file" className="form-control form-control-lg" onChange={(e) => setImage(e.target.files[0])} />
                                 </div>
 
                                 <ErrorMessage message={errorMessage} />

@@ -4,20 +4,23 @@ import { UserContext } from "../context/UserContext";
 import { Redirect } from 'react-router-dom';
 
 export const ProductUpdate = props => {
-    const [ product, setProduct] = useState([])
+    const [product, setProduct] = useState([])
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
+    const [image, setImage] = useState(null)
     const [errorMessage, setErrorMessage] = useState("")
     const {token} = useContext(UserContext)
 
     var id = props.location.state
 
     useEffect(() => {
-        fetch(`/api/v1/products/${id}`, {mode: 'cors'})
-        .then((response) => response.json())
-        .then((json) => {
-            setProduct(json)
-        })
+        fetch(`/api/v1/products/${id}`, { mode: 'cors' })
+            .then((response) => response.json())
+            .then((json) => {
+                setProduct(json)
+                setName(product.name)
+                setDescription(product.description)
+            })
     }, [id])
 
     const submitProductUpdate = async () => {
@@ -28,14 +31,33 @@ export const ProductUpdate = props => {
                 Authorization: "bearer " + token.token,
             },
             body: JSON.stringify({
-                    name: name,
-                    description: description,
+                name: name,
+                description: description,
             }),
             mode: 'cors',
         }
 
         const response = await fetch(`/api/v1/products/${id}`, requestOptions)
         const data = await response.json()
+
+        // uploading image
+        console.log(image, '------------------------')
+        if (image) {
+            const imageData = new FormData()
+            imageData.append('image', image)
+
+            const requestOptionsForImage = {
+                method: 'POST',
+                headers: {
+                    Authorization: "bearer " + token,
+                },
+                body: imageData,
+                mode: 'cors',
+            }
+
+            const responseImage = await fetch(`api/v1/products/${data.id}/images`, requestOptionsForImage)
+            const imageResponse = await responseImage.json()
+        }
 
         if (!response.ok) {
             let responseErrorMessage = data.detail
@@ -45,10 +67,13 @@ export const ProductUpdate = props => {
                 responseErrorMessage = ''
             }
             setErrorMessage(responseErrorMessage)
-        } else{
+        } else {
             return <Redirect to="product"></Redirect>
         }
+
     }
+
+
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -69,7 +94,11 @@ export const ProductUpdate = props => {
                                 </div>
 
                                 <div className="form-outline mb-4">
-                                    <input type="text" className="form-control form-control-lg" placeholder={product.description} value={description} onChange={(e) => setDescription(e.target.value)}/>
+                                    <input type="text" className="form-control form-control-lg" placeholder={product.description} value={description} onChange={(e) => setDescription(e.target.value)} />
+                                </div>
+
+                                <div className="form-outline mb-4">
+                                    <input type="file" className="form-control form-control-lg" onChange={(e) => setImage(e.target.files[0])} />
                                 </div>
 
                                 <ErrorMessage message={errorMessage} />
