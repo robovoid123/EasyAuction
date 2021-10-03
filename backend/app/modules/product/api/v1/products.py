@@ -66,7 +66,7 @@ def get_products(*,
     return product_repo.get_multi(db, skip=skip, limit=limit)
 
 
-@router.get("/user/{user_id}")
+@router.get("/users/{user_id}")
 def get_user_products(*,
                       user_id: int,
                       skip: int = 0,

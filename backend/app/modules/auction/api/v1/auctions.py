@@ -66,7 +66,7 @@ def bid_in_auction(*, id: int,
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION
 
-    if auction.state is not AuctionState.ONGOING:
+    if auction.state != AuctionState.ONGOING:
         raise AUCTION_NOT_STARTED_EXCEPTION
 
     english = EnglishAuction()
@@ -125,6 +125,19 @@ def create_auction(*,
 def get_auctions(*,
                  skip: int = 0,
                  limit: int = 5,
+                 states: str = 'ongoing,ended',
                  like: Optional[str] = None,
                  db: Session = Depends(get_db)):
-    return auction_repo.get_multi(db, skip=skip, limit=limit, like=like)
+    states = states.split(',')
+    return auction_repo.get_multi(db, skip=skip, limit=limit, like=like, states=states)
+
+
+@router.get("/users/{user_id}", response_model=List[AuctionInDB])
+def get_users_auction(*,
+                      user_id: int,
+                      skip: int = 0,
+                      limit: int = 5,
+                      states: str = 'ongoing,ended',
+                      db: Session = Depends(get_db)):
+    states = states.split(',')
+    return auction_repo.get_multi_by_user(db, skip=skip, limit=limit, states=states, user_id=user_id)
