@@ -15,8 +15,8 @@ const ItemPage = props => {
                 setAuction(json)
                 setIsLoading(false)
             });
-
     }, [id]);
+
 
 
     return (
@@ -48,8 +48,9 @@ const ItemPage = props => {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="card p-4" style={{ height: "20rem" }}>
-                            <h2 className="mb-4">${auction.current_bid_amount}</h2>
+                        <div className="card p-4" style={{height:"20rem"}}>
+                            <h2 className="mb-4">{new Intl.NumberFormat("en-GB", {style: "currency",currency: "USD",maximumFractionDigits: 2 }).format(auction.current_bid_amount)}</h2>
+
                             <label>YOUR MAXIMUM BID:</label>
                             <input type="text" className="form-control mb-3 mt-2" placeholder="Enter price to bid" value={bid} onChange={(e) => setBid(e.target.value)} required />
                             <BidHandleButton id={id} bid={bid} />

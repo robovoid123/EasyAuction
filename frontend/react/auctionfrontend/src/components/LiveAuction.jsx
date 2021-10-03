@@ -28,7 +28,7 @@ const LiveAuction = () => {
                                         <h5 className="card-title">{auction.product.name}</h5>
                                         <p className="card-text"><span>Current Bid Amount: </span>{new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(auction.current_bid_amount)}</p>
                                         <p className="card-text"><span>Ending Date: </span>{new Intl.DateTimeFormat("en-GB").format(new Date(auction.ending_date))}</p>
-                                        <ProductIndiButton productid={auction.id} />
+                                        <ProductIndiButton id={auction.id} />
                                     </div>
                                 </div>
                             </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AddAuction } from '../components/AddAuction'
 import { DeleteProduct } from '../components/DeleteProduct'
 
 const Product = () => {
