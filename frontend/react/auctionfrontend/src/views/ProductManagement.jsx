@@ -7,7 +7,7 @@ const Product = () => {
     const [products, setProducts] = useState([])
 
     useEffect(() => {
-        fetch(`/api/v1/products/user/104?skip=0&limit=5`, { mode: 'cors' })
+        fetch(`/api/v1/products/users/104?skip=0&limit=5`, { mode: 'cors' })
             .then((response) => response.json())
             .then((json) => {
                 setProducts(json)
@@ -38,7 +38,7 @@ const Product = () => {
                                             <DeleteProduct id={product.id} />
                                         </div>
                                     </div>
-                                    <img src="https://i.imgur.com/KFojDGa.jpg" alt="Product Display" width="200" class="ml-lg-5 order-1 order-lg-2" />
+                                    <img src={(product.images.length) >= 1 ? "http://localhost:8000" + product.images[product.images.length - 1].url : "https://dummyimage.com/300x200/000/fff"} alt="Product Display" width="200" class="ml-lg-5 order-1 order-lg-2" />
                                 </div>
                             </li>
                         </ul>
