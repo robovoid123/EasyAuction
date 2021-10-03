@@ -127,9 +127,10 @@ def get_auctions(*,
                  limit: int = 5,
                  states: str = 'ongoing,ended',
                  like: Optional[str] = None,
+                 order_by: str = 'last_bid_at',
                  db: Session = Depends(get_db)):
     states = states.split(',')
-    return auction_repo.get_multi(db, skip=skip, limit=limit, like=like, states=states)
+    return auction_repo.get_multi(db, skip=skip, limit=limit, like=like, states=states, order_by=order_by)
 
 
 @router.get("/users/{user_id}", response_model=List[AuctionInDB])
@@ -138,6 +139,7 @@ def get_users_auction(*,
                       skip: int = 0,
                       limit: int = 5,
                       states: str = 'ongoing,ended',
+                      order_by: str = 'last_bid_at',
                       db: Session = Depends(get_db)):
     states = states.split(',')
-    return auction_repo.get_multi_by_user(db, skip=skip, limit=limit, states=states, user_id=user_id)
+    return auction_repo.get_multi_by_user(db, skip=skip, limit=limit, states=states, order_by=order_by, user_id=user_id)
