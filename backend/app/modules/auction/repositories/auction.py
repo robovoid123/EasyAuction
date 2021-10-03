@@ -1,3 +1,4 @@
+from typing import List
 from app.modules.auction.models.auction_state import AuctionState
 from datetime import datetime
 from sqlalchemy.orm import Session
@@ -11,11 +12,14 @@ from app.modules.product.models.product import Product
 
 class AuctionRepository(BaseRepository[Auction, AuctionCreate, AuctionUpdate]):
 
-    def get_multi(self, db: Session, *, skip: int = 0, limit: int = 100, like: str = None):
+    def get_multi(self, db: Session, *, skip: int = 0, limit: int = 100, like: str = None, states: List[str]):
         auctions = db.query(self.model).join(Product)
         if like:
             auctions = auctions.filter(Product.name.like('%' + like + '%'))
-        return auctions.offset(skip).limit(limit).all()
+        return auctions.filter(self.model.state.in_(states)).offset(skip).limit(limit).all()
+
+    def get_multi_by_user(self, db: Session, *, skip: int = 0, limit: int = 0, states: List[str], user_id: int):
+        return db.query(self.model).filter(self.model.owner_id == user_id).filter(self.model.state.in_(states)).offset(skip).limit(limit).all()
 
     def create_with_owner(self, db: Session, obj_in: AuctionCreate, owner_id: int) -> Auction:
         obj_in_data = jsonable_encoder(obj_in)

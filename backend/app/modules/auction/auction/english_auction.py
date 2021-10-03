@@ -16,7 +16,7 @@ INVALID_BID_EXCEPTION = HTTPException(status_code=400,
 
 AUCTION_NOT_STARTED_EXCEPTION = HTTPException(
     status_code=400,
-    detail='auction not started'
+    detail='auction not started from'
 )
 
 
@@ -48,7 +48,7 @@ class EnglishAuction:
         if not self.is_valid_bid(db_obj=db_obj, amount=amount):
             raise INVALID_BID_EXCEPTION
 
-        if db_obj.state is not AuctionState.ONGOING:
+        if db_obj.state != AuctionState.ONGOING:
             raise AUCTION_NOT_STARTED_EXCEPTION
 
         new_bid = bid_repo.create(db, obj_in=BidCreate(
