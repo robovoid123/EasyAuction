@@ -58,7 +58,7 @@ def create_product(*,
     return product
 
 
-@router.get("/")
+@router.get("/", response_model=List[ProductInDB])
 def get_products(*,
                  skip: int = 0,
                  limit: int = 5,
@@ -66,7 +66,7 @@ def get_products(*,
     return product_repo.get_multi(db, skip=skip, limit=limit)
 
 
-@router.get("/users/{user_id}")
+@router.get("/users/{user_id}", response_model=List[ProductInDB])
 def get_user_products(*,
                       user_id: int,
                       skip: int = 0,
