@@ -7,7 +7,7 @@ const Login = props => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
-    const [, setToken] = useContext(UserContext)
+    const {token} = useContext(UserContext)
 
     const submitLogin = async () => {
         const requestOptions = {
@@ -31,7 +31,7 @@ const Login = props => {
             }
             setErrorMessage(responseErrorMessage)
         } else {
-            setToken(data.access_token)
+            token[1](data.access_token)
             props.history.push('/')
         }
     }

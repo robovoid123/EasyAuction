@@ -8,7 +8,7 @@ export const ProductUpdate = props => {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
-    const [token,] = useContext(UserContext)
+    const {token} = useContext(UserContext)
 
     var id = props.location.state
 
@@ -25,13 +25,11 @@ export const ProductUpdate = props => {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
-                Authorization: "bearer " + token,
+                Authorization: "bearer " + token.token,
             },
             body: JSON.stringify({
-                product_in: {
                     name: name,
                     description: description,
-                },
             }),
             mode: 'cors',
         }

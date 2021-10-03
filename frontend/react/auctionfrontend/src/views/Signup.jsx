@@ -8,7 +8,7 @@ const Signup = props => {
     const [fullname, setFullname] = useState("")
     const [image, setImage] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
-    const [, setToken] = useContext(UserContext)
+    const {token} = useContext(UserContext)
 
     const submitRegistration = async () => {
 
@@ -40,7 +40,7 @@ const Signup = props => {
             }
             setErrorMessage(responseErrorMessage)
         } else {
-            setToken(data.access_token)
+            token[1](data.access_token)
             props.history.push("login")
         }
     }

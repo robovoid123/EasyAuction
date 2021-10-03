@@ -4,14 +4,14 @@ import { UserContext } from "../context/UserContext";
 
 export const DeleteProduct = ({id}) => {
     const [errorMessage, setErrorMessage] = useState("")
-    const [token,] = useContext(UserContext)
+    const {token} = useContext(UserContext)
 
     const submitProductAdd = async () => {
         const requestOptions = {
             method: 'DELETE',
             headers: {
                 "Content-Type": "application/json",
-                Authorization: "bearer " + token,
+                Authorization: "bearer " + token[0],
             },
             mode: 'cors',
         }

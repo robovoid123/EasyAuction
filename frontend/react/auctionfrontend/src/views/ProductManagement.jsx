@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AddAuction } from '../components/AddAuction'
 import { DeleteProduct } from '../components/DeleteProduct'
+import { UserContext } from '../context/UserContext'
 
-const Product = () => {
-
+const Product = props => {
     const [products, setProducts] = useState([])
+    const {userData} = useContext(UserContext)
+
+    // const userId = props.location.state
 
     useEffect(() => {
-        fetch(`/api/v1/products/user/104?skip=0&limit=5`, {mode: 'cors'})
+        fetch(`/api/v1/products/users/${userData[0][0]}?skip=0&limit=5`, {mode: 'cors'})
         .then((response) => response.json())
         .then ((json) => {
             setProducts(json)
         })
-    }, [])
+    }, [userData])
 
     return (
         <div className="container">

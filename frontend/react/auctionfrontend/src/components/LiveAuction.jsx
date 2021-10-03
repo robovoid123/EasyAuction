@@ -19,7 +19,7 @@ const LiveAuction = () => {
            <h2>Live Auctions</h2>
             <div className="row g-4">
                {auctions.map((auction) => {
-                   if (auction.state === 'ongoing') {
+                   if (auction.state === 'ongoing' && auction.bid_count > 1) {
                        return (
                             <div className="col-12 col-md-4 col-lg-3">
                                 <div className="card">

@@ -6,14 +6,14 @@ const ProductAdd = props => {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
-    const [token,] = useContext(UserContext)
+    const {token} = useContext(UserContext)
 
     const submitProductAdd = async () => {
         const requestOptions = {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
-                Authorization: "bearer " + token,
+                Authorization: "bearer " + token.token,
             },
             body: JSON.stringify({
                 product_in: {
