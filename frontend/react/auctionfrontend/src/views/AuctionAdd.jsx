@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { UserContext } from "../context/UserContext";
 
-const ProductAdd = props => {
+const AuctionAdd = props => {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [image, setImage] = useState(null)
@@ -14,7 +14,7 @@ const ProductAdd = props => {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
-                Authorization: "bearer " + token.token,
+                Authorization: "bearer " + token[0],
             },
             body: JSON.stringify({
                 product_in: {
@@ -50,7 +50,7 @@ const ProductAdd = props => {
         const requestOptionsForImage = {
             method: 'POST',
             headers: {
-                Authorization: "bearer " + token,
+                Authorization: "bearer " + token[0],
             },
             body: imageData,
             mode: 'cors',
@@ -100,4 +100,4 @@ const ProductAdd = props => {
     )
 }
 
-export default ProductAdd
+export default AuctionAdd

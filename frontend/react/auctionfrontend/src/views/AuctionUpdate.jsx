@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { UserContext } from "../context/UserContext";
-import { Redirect } from 'react-router-dom';
 
-export const ProductUpdate = props => {
+export const AuctionUpdate = props => {
     const [product, setProduct] = useState([])
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
@@ -28,7 +27,7 @@ export const ProductUpdate = props => {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
-                Authorization: "bearer " + token.token,
+                Authorization: "bearer " + token[0],
             },
             body: JSON.stringify({
                 name: name,
@@ -41,7 +40,6 @@ export const ProductUpdate = props => {
         const data = await response.json()
 
         // uploading image
-        console.log(image, '------------------------')
         if (image) {
             const imageData = new FormData()
             imageData.append('image', image)
@@ -49,7 +47,7 @@ export const ProductUpdate = props => {
             const requestOptionsForImage = {
                 method: 'POST',
                 headers: {
-                    Authorization: "bearer " + token,
+                    Authorization: "bearer " + token[0],
                 },
                 body: imageData,
                 mode: 'cors',
@@ -68,7 +66,7 @@ export const ProductUpdate = props => {
             }
             setErrorMessage(responseErrorMessage)
         } else {
-            return <Redirect to="product"></Redirect>
+            props.history.push('product')
         }
 
     }

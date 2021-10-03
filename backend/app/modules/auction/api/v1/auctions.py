@@ -129,6 +129,18 @@ def get_auctions(*,
                  like: Optional[str] = None,
                  order_by: str = 'last_bid_at',
                  db: Session = Depends(get_db)):
+    """
+                order by \n
+                ------------\n
+                "bid_count" \n
+                "starting_bid_amount"\n
+                "bid_cap"\n
+                "starting_date"\n
+                "ending_date"\n
+                "last_bid_at"\n
+                "reserve"
+
+    """
     states = states.split(',')
     return auction_repo.get_multi(db, skip=skip, limit=limit, like=like, states=states, order_by=order_by)
 

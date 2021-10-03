@@ -1,8 +1,8 @@
 import React, {useContext, useState} from 'react'
-import { ErrorMessage } from "../components/ErrorMessage";
+import { ErrorMessage } from "./ErrorMessage";
 import { UserContext } from "../context/UserContext";
 
-export const DeleteProduct = ({id}) => {
+export const DeleteAuction = ({id}) => {
     const [errorMessage, setErrorMessage] = useState("")
     const {token} = useContext(UserContext)
 
@@ -27,6 +27,8 @@ export const DeleteProduct = ({id}) => {
                 responseErrorMessage = ''
             }
             setErrorMessage(responseErrorMessage)
+        } else {
+            window.location.reload(); 
         }
     }
 
