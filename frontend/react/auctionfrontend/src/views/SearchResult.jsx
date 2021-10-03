@@ -10,8 +10,8 @@ const SearchResult = props => {
     console.log(searchKey)
 
     React.useEffect(() => {
-        fetch(`/api/v1/auctions/?skip=0&limit=80&like=${searchKey}`, {mode: 'cors'})
-            .then((response) => response.json()) 
+        fetch(`/api/v1/auctions/?skip=0&limit=80&like=${searchKey}`, { mode: 'cors' })
+            .then((response) => response.json())
             .then((json) => {
                 console.log(json)
                 setAuctions(json)
@@ -20,10 +20,10 @@ const SearchResult = props => {
 
     return (
         <div className="container mt-5">
-           <h2>Your Search Results</h2>
+            <h2>Your Search Results</h2>
             <div className="row g-4">
                 {auctions.map((auction) => (
-                    <div className="col-12 col-md-4 col-lg-3">
+                    <div className="col-12 col-md-4 col-lg-3" key={auction.id}>
                         <div className="card">
                             <img src="https://dummyimage.com/300x200/000/fff" className="card-img-top" alt="..." />
                             <div className="card-body">
@@ -36,7 +36,7 @@ const SearchResult = props => {
                         </div>
                     </div>
                 ))}
-            </div> 
+            </div>
         </div>
     )
 }
