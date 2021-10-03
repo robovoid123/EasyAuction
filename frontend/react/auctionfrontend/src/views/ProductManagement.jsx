@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AddAuction } from '../components/AddAuction'
 import { DeleteProduct } from '../components/DeleteProduct'
 
 const Product = () => {
@@ -35,6 +36,7 @@ const Product = () => {
                                                 }}>
                                                     <button className="btn btn-info me-2 my-2 text-light">Update Product</button>
                                                 </Link>
+                                                <AddAuction/>
                                                 <DeleteProduct id={product.id} />
                                             </div>
                                         </div>
