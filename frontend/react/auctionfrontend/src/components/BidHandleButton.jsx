@@ -6,6 +6,8 @@ export const BidHandleButton = ({id, bid}) => {
     const{token} = useContext(UserContext)
     const [errorMessage, setErrorMessage] = React.useState("")
 
+    console.log(typeof bid, bid)
+
     const submitBid = async () => {
         const requestOptions = {
             method: 'POST',

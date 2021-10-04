@@ -127,26 +127,32 @@ export const AuctionUpdate = props => {
                                 <h3 className="fw-normal mb-3 pb-3" style={{ letterSpacing: "1px" }}>Update Product</h3>
 
                                 <div className="form-outline mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">Product Name</label>
                                     <input type="text" className="form-control form-control-lg" placeholder={auction.product.name} value={name} onChange={(e) => setName(e.target.value)} />
                                 </div>
 
                                 <div className="form-outline mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">Description</label>
                                     <input type="text" className="form-control form-control-lg" placeholder={auction.product.description} value={description} onChange={(e) => setDescription(e.target.value)} />
                                 </div>
 
                                 <div className="form-outline mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">Starting Amount</label>
                                     <input type="text" className="form-control form-control-lg" placeholder={auction.starting_amount} value={startingAmount} onChange={(e) => setStartingAmount(e.target.value)} />
                                 </div>
 
                                 <div className="form-outline mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">Bid Cap</label>
                                     <input type="text" className="form-control form-control-lg" placeholder={auction.bid_cap} value={bidCap} onChange={(e) => setBidCap(e.target.value)} />
                                 </div>
 
                                 <div className="form-outline mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">Reserve</label>
                                     <input type="text" className="form-control form-control-lg" placeholder={auction.reserve} value={reserve} onChange={(e) => setReserve(e.target.value)} />
                                 </div>
 
                                 <div className="form-outline mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">Add Image</label>
                                     <input type="file" className="form-control form-control-lg" onChange={(e) => setImage(e.target.files[0])} />
                                 </div>
 
