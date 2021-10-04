@@ -158,6 +158,9 @@ export const AuctionUpdate = props => {
                             </form>
                         </div>
                     </div>
+                    <div className="col-sm-6 my-5">
+                        <img src={(auction.product.images.length) >= 1 ? "http://localhost:8000" + auction.product.images[auction.product.images.length - 1].url : "https://dummyimage.com/300x200/000/fff"} alt="Product Display" className="img-fluid" />
+                    </div>
                 </div>)}
             </div>
         </section>
