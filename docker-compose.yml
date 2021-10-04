@@ -26,6 +26,19 @@ services:
       - 5432:5432
     networks:
       - backend_network
+
+  # frontendreact:
+  #     container_name: frontendreact
+  #     build:
+  #       context: ./frontend/react/auctionfrontend
+  #       dockerfile: Dockerfile
+  #     volumes:
+  #       - '.:/frontend/react/auctionfrontend'
+  #       - '/node_modules'
+  #     ports:
+  #       - 3000:3000
+  #     environment:
+  #       - CHOKIDAR_USEPOLLING=true
 volumes:
   postgres_data:
   
