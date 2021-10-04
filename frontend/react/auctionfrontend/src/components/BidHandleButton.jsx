@@ -30,6 +30,8 @@ export const BidHandleButton = ({id, bid}) => {
                 responseErrorMessage = ''
             }
             setErrorMessage(responseErrorMessage)
+        } else {
+            window.location.reload()
         }
     }
 

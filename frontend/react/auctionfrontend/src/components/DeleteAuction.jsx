@@ -6,7 +6,7 @@ export const DeleteAuction = ({id}) => {
     const [errorMessage, setErrorMessage] = useState("")
     const {token} = useContext(UserContext)
 
-    const submitProductAdd = async () => {
+    const submitDeleteAuction = async () => {
         const requestOptions = {
             method: 'DELETE',
             headers: {
@@ -16,11 +16,23 @@ export const DeleteAuction = ({id}) => {
             mode: 'cors',
         }
 
-        const response = await fetch(`/api/v1/products/${id}`, requestOptions)
+        const response = await fetch(`/api/v1/auctions/${id}`, requestOptions)
         const data = await response.json()
 
+        const requestOptionsProductDelete = {
+            method: 'DELETE',
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "bearer " + token[0],
+            },
+            mode: 'cors',
+        }
+
+        const responseDeleteProduct = await fetch(`/api/v1/products/${data.product_id}`, requestOptionsProductDelete)
+        const dataDeleteProduct = await responseDeleteProduct.json()
+
         if (!response.ok) {
-            let responseErrorMessage = data.detail
+            let responseErrorMessage = dataDeleteProduct.detail
             // if error message from backend is a string then only set ErrorMessage
             // TODO: error message which are object need to be handled seperately
             if (typeof (responseErrorMessage) !== 'string') {
@@ -34,7 +46,7 @@ export const DeleteAuction = ({id}) => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        submitProductAdd()
+        submitDeleteAuction()
     }
 
     return (

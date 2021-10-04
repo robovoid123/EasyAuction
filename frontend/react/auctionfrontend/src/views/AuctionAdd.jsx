@@ -5,6 +5,9 @@ import { UserContext } from "../context/UserContext";
 const AuctionAdd = props => {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
+    const [startingAmount, setStartingAmount] = useState("")
+    const [bidCap, setBidCap] = useState("")
+    const [reserve, setReserve] = useState("")
     const [image, setImage] = useState(null)
     const [errorMessage, setErrorMessage] = useState("")
     const {token} = useContext(UserContext)
@@ -39,9 +42,7 @@ const AuctionAdd = props => {
                 responseErrorMessage = ''
             }
             setErrorMessage(responseErrorMessage)
-        } else {
-            props.history.push('product')
-        }
+        } 
 
         // uploading image
         const imageData = new FormData()
@@ -56,8 +57,49 @@ const AuctionAdd = props => {
             mode: 'cors',
         }
 
-        const responseImage = await fetch(`api/v1/products/${data.id}/images`, requestOptionsForImage)
+        const responseImage = await fetch(`/api/v1/products/${data.id}/images`, requestOptionsForImage)
         const imageResponse = await responseImage.json()
+
+        if (!response.ok) {
+            let responseErrorMessage = imageResponse.detail
+            // if error message from backend is a string then only set ErrorMessage
+            // TODO: error message which are object need to be handled seperately
+            if (typeof (responseErrorMessage) !== 'string') {
+                responseErrorMessage = ''
+            }
+            setErrorMessage(responseErrorMessage)
+        } 
+
+        // Creating Auction
+        const requestOptionsForCreatingAuction = {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "bearer " + token[0],
+            },
+            body: JSON.stringify({
+                "starting_amount": parseInt(startingAmount),
+                "bid_cap": parseInt(bidCap),
+                "reserve": parseInt(reserve),
+                "product_id": data.id,
+            }),
+            mode: 'cors',
+        }
+
+        const responseCreateAuction = await fetch("/api/v1/auctions", requestOptionsForCreatingAuction)
+        const createAuctionResponse = await responseCreateAuction.json()
+
+        if (!response.ok) {
+            let responseErrorMessage = createAuctionResponse.detail
+            // if error message from backend is a string then only set ErrorMessage
+            // TODO: error message which are object need to be handled seperately
+            if (typeof (responseErrorMessage) !== 'string') {
+                responseErrorMessage = ''
+            }
+            setErrorMessage(responseErrorMessage)
+        } else {
+            props.history.push('product')
+        }
     }
 
     const handleSubmit = (e) => {
@@ -80,6 +122,17 @@ const AuctionAdd = props => {
 
                                 <div className="form-outline mb-4">
                                     <input type="text" className="form-control form-control-lg" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
+                                </div>
+
+                                <div className="form-outline mb-4">
+                                    <input type="text" className="form-control form-control-lg" placeholder="Starting Amount" value={startingAmount} onChange={(e) => setStartingAmount(e.target.value)} required />
+                                </div>
+                                <div className="form-outline mb-4">
+                                    <input type="text" className="form-control form-control-lg" placeholder="Bid Cap" value={bidCap} onChange={(e) => setBidCap(e.target.value)} required />
+                                </div>
+
+                                <div className="form-outline mb-4">
+                                    <input type="text" className="form-control form-control-lg" placeholder="Reserve" value={reserve} onChange={(e) => setReserve(e.target.value)} required />
                                 </div>
 
                                 <div className="form-outline mb-4">
