@@ -2,7 +2,7 @@ from typing import List
 from app.modules.auction.models.auction_state import AuctionState
 from datetime import datetime
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 from fastapi.encoders import jsonable_encoder
 from fastapi import HTTPException
 
@@ -30,20 +30,22 @@ class AuctionRepository(BaseRepository[Auction, AuctionCreate, AuctionUpdate]):
             "reserve": model.reserve
         }
 
-    def get_multi(self, db: Session, *, skip: int = 0, limit: int = 100, like: str = None, states: List[str], order_by: str):
+    def get_multi(self, db: Session, *, skip: int = 0, limit: int = 100, like: str = None, states: List[str], order_by: str, is_desc: bool = True):
         order_by_column = self.order_by_columns.get(order_by)
         if not order_by_column:
             raise INVALID_ORDER_BY_EXCEPTION
+        order_by_final = desc(order_by_column) if is_desc else asc(order_by_column)
         auctions = db.query(self.model).join(Product)
         if like:
             auctions = auctions.filter(Product.name.like('%' + like + '%'))
-        return auctions.filter(self.model.state.in_(states)).order_by(desc(order_by_column)).offset(skip).limit(limit).all()
+        return auctions.filter(self.model.state.in_(states)).order_by(order_by_final).offset(skip).limit(limit).all()
 
-    def get_multi_by_user(self, db: Session, *, skip: int = 0, limit: int = 0, states: List[str], order_by: str, user_id: int):
+    def get_multi_by_user(self, db: Session, *, skip: int = 0, limit: int = 0, states: List[str], order_by: str, is_desc: bool = True, user_id: int):
         order_by_column = self.order_by_columns.get(order_by)
         if not order_by_column:
             raise INVALID_ORDER_BY_EXCEPTION
-        return db.query(self.model).filter(self.model.owner_id == user_id).filter(self.model.state.in_(states)).order_by(desc(order_by_column)).offset(skip).limit(limit).all()
+        order_by_final = desc(order_by_column) if is_desc else asc(order_by_column)
+        return db.query(self.model).filter(self.model.owner_id == user_id).filter(self.model.state.in_(states)).order_by(order_by_final).offset(skip).limit(limit).all()
 
     def create_with_owner(self, db: Session, obj_in: AuctionCreate, owner_id: int) -> Auction:
         obj_in_data = jsonable_encoder(obj_in)

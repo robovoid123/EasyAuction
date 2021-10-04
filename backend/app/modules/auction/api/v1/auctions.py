@@ -17,17 +17,17 @@ from app.modules.auction.repositories import auction_repo
 
 OWNER_ONLY_EXCEPTION = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='only auction owner can do this action'
+    detail='You do not have enough privilege to do this action'
 )
 
 AUCTION_NOT_FOUND_EXCEPTION = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail='auction not found'
+    detail='Auction not found'
 )
 
 AUCTION_NOT_STARTED_EXCEPTION = HTTPException(
     status_code=400,
-    detail='auction not started'
+    detail='Auction has not yet been started'
 )
 
 router = APIRouter()
@@ -125,24 +125,32 @@ def create_auction(*,
 def get_auctions(*,
                  skip: int = 0,
                  limit: int = 5,
-                 states: str = 'ongoing,ended',
+                 states: Optional[str] = 'ongoing,ended',
                  like: Optional[str] = None,
-                 order_by: str = 'last_bid_at',
+                 order_by: Optional[str] = 'last_bid_at',
+                 is_desc: Optional[bool] = True,
                  db: Session = Depends(get_db)):
     """
-                order by \n
-                ------------\n
-                "bid_count" \n
-                "starting_bid_amount"\n
-                "bid_cap"\n
-                "starting_date"\n
-                "ending_date"\n
-                "last_bid_at"\n
-                "reserve"
+                ## order by available options\n
+                - bid_count 
+                - starting_bid_amount
+                - bid_cap
+                - starting_date
+                - ending_date
+                - last_bid_at
+                - reserve
+
+                -----------\n
+
+                ## states available options\n
+                - ongoing
+                - started
+                - ended
+                - canceled
 
     """
     states = states.split(',')
-    return auction_repo.get_multi(db, skip=skip, limit=limit, like=like, states=states, order_by=order_by)
+    return auction_repo.get_multi(db, skip=skip, limit=limit, like=like, states=states, order_by=order_by, is_desc=is_desc)
 
 
 @router.get("/users/{user_id}", response_model=List[AuctionInDB])
@@ -150,8 +158,28 @@ def get_users_auction(*,
                       user_id: int,
                       skip: int = 0,
                       limit: int = 5,
-                      states: str = 'ongoing,ended',
-                      order_by: str = 'last_bid_at',
+                      states: Optional[str] = 'ongoing,ended',
+                      order_by: Optional[str] = 'last_bid_at',
+                      is_desc: Optional[bool] = True,
                       db: Session = Depends(get_db)):
+    """
+                ## order by available options\n
+                - bid_count 
+                - starting_bid_amount
+                - bid_cap
+                - starting_date
+                - ending_date
+                - last_bid_at
+                - reserve
+
+                -----------\n
+
+                ## states available options\n
+                - ongoing
+                - started
+                - ended
+                - canceled
+
+    """
     states = states.split(',')
-    return auction_repo.get_multi_by_user(db, skip=skip, limit=limit, states=states, order_by=order_by, user_id=user_id)
+    return auction_repo.get_multi_by_user(db, skip=skip, limit=limit, states=states, order_by=order_by, is_desc=is_desc, user_id=user_id)

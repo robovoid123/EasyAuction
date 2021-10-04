@@ -11,12 +11,12 @@ from app.db.session import SessionLocal
 INC_AMT = 1.25
 
 INVALID_BID_EXCEPTION = HTTPException(status_code=400,
-                                      detail="invalid bid")
+                                      detail="Bid needs to be greater than Current Highest Bid")
 
 
 AUCTION_NOT_STARTED_EXCEPTION = HTTPException(
     status_code=400,
-    detail='auction not started from'
+    detail='Auction has not yet been started'
 )
 
 
