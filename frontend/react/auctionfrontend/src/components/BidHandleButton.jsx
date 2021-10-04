@@ -3,7 +3,7 @@ import { UserContext } from '../context/UserContext'
 import { ErrorMessage } from '../components/ErrorMessage'
 
 export const BidHandleButton = ({id, bid}) => {
-    const[token, ] = useContext(UserContext)
+    const{token} = useContext(UserContext)
     const [errorMessage, setErrorMessage] = React.useState("")
 
     const submitBid = async () => {
@@ -11,7 +11,7 @@ export const BidHandleButton = ({id, bid}) => {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
-                Authorization: "bearer " + token,
+                Authorization: "bearer " + token[0],
             },
             body: JSON.stringify(
                 bid
@@ -30,6 +30,8 @@ export const BidHandleButton = ({id, bid}) => {
                 responseErrorMessage = ''
             }
             setErrorMessage(responseErrorMessage)
+        } else {
+            window.location.reload()
         }
     }
 
@@ -40,7 +42,7 @@ export const BidHandleButton = ({id, bid}) => {
 
     return (
         <>
-            {token === 'null' || !token ? (
+            {token[0] === 'null' || !token[0] ? (
                 <>
                     <button className="btn btn-info text-light fw-bold fs-5 mb-4" disabled>PLACE BID</button>
                     <p className="text-danger">Please login to bid or signup if account is not opened.</p>

@@ -3,11 +3,10 @@ import SearchNav from "./SearchNav"
 import { UserContext } from "../context/UserContext"
 
 const Nav = () => {
-    const [token, setToken] = useContext(UserContext)
-
+    const {token, } = useContext(UserContext)
 
     const handleLogout = () => {
-        setToken(null)
+        token[1](null)
     }
 
     return (
@@ -28,14 +27,14 @@ const Nav = () => {
                     </ul>
                     <div className="navbar-nav">
                         <SearchNav />
-                        {token === 'null' || !token ? (
+                        {token[0] === 'null' || !token[0] ? (
                             <>
                                 <a href="login" className="btn btn-link px-3 me-2 nav-link">Login</a>
                                 <a href="signup" className="btn btn-info me-3 nav-link text-light">Sign up</a>
                             </>
                         ) : (
                             <>
-                                <a href="product" className="btn btn-info nav-link text-light ms-2">Product Management</a>
+                                <a href="product" className="btn btn-info nav-link text-light ms-2">AuctionManagement</a>
                                 <button className="btn btn-info nav-link text-light mx-2" onClick={handleLogout}>Logout</button>
                             </>
                         )}

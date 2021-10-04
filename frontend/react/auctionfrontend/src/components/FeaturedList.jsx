@@ -6,7 +6,7 @@ const FeaturedList = () => {
     const [auctions, setAuctions] = React.useState([])
 
     React.useEffect(() => {
-        fetch("/api/v1/auctions/?skip=0&limit=100", { mode: 'cors' })
+        fetch("/api/v1/auctions/?skip=0&limit=5&states=ongoing&order_by=bid_count", { mode: 'cors' })
             .then((response) => response.json())
             .then((json) => {
                 console.log(json)

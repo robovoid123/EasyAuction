@@ -4,30 +4,30 @@ export const UserContext = createContext();
 
 export const UserProvider = (props) => {
   const [token, setToken] = useState(localStorage.getItem("userLoginToken"));
+  const [userId, setUserId] = useState(localStorage.getItem("userId"))
 
   useEffect(() => {
-    // const fetchUser = async () => {
-    // const requestOptions = {
-    // method: "GET",
-    // headers: {
-    // "Content-Type": "application/json",
-    // Authorization: "Bearer " + token,
-    // },
-    // mode: "cors",
-    // };
-
-    // const response = await fetch("/api/v1/auth/access-token", requestOptions);
-
-    // if (!response.ok) {
-    //   setToken(null);
-    // }
-    // };
     localStorage.setItem("userLoginToken", token);
+    const fetchUser = async () => {
+      const requestOption =  {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "bearer " + token,
+        },
+        mode: 'cors',
+      }
+
+      const response = await fetch("/api/v1/users/me", requestOption)
+      const data = await response.json()
+
+      localStorage.setItem("userId", data.id);
+    }
+    fetchUser()
 
   }, [token]);
 
   return (
-    <UserContext.Provider value={[token, setToken]}>
+    <UserContext.Provider value={{ token:[token, setToken], userData:[userId, setUserId]}}>
       {props.children}
     </UserContext.Provider>
   );

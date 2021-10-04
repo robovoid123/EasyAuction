@@ -3,9 +3,9 @@ import Nav from './components/NavBar'
 import Login from './views/Login'
 import HomePage from './views/HomePage'
 import Signup from './views/Signup'
-import Product from './views/ProductManagement'
-import ProductAdd from './views/ProductAdd'
-import {ProductUpdate} from './views/ProductUpdate'
+import Auction from './views/AuctionManagement'
+import AuctionAdd from './views/AuctionAdd'
+import {AuctionUpdate} from './views/AuctionUpdate'
 import ItemPage from './views/ItemPage'
 import SearchResult from './views/SearchResult'
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
@@ -20,9 +20,9 @@ function App() {
             <Route path="/" exact component={HomePage} />
             <Route path="/login" exact component={Login} />
             <Route path="/signup" exact component={Signup} />
-            <Route path="/product" exact component={Product} />
-            <Route path="/productAdd" exact component={ProductAdd} />
-            <Route path="/productUpdate" exact component={ProductUpdate} />
+            <Route path="/product" exact component={Auction} />
+            <Route path="/productAdd" exact component={AuctionAdd} />
+            <Route path="/productUpdate" exact component={AuctionUpdate} />
             <Route path="/item" exact component={ItemPage} />
             <Route path="/searchResult" exact component={SearchResult} />
           </Switch>
