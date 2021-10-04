@@ -30,6 +30,21 @@ AUCTION_NOT_STARTED_EXCEPTION = HTTPException(
     detail='Auction has not yet been started'
 )
 
+AUCTION_ENDED_EXCEPTION = HTTPException(
+    status_code=400,
+    detail='Auction has already been ended'
+)
+
+AUCTION_CANCELED_EXCEPTION = HTTPException(
+    status_code=400,
+    detail='Auction has been canceled'
+)
+
+AUCTION_ONGOING_EXCEPTION = HTTPException(
+    status_code=400,
+    detail='Auction is already ongoing'
+)
+
 router = APIRouter()
 
 
@@ -42,6 +57,15 @@ def start_auction(*, id: int,
     auction = auction_repo.get(db, id=id)
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION
+
+    if auction.state != AuctionState.CREATED:
+        if auction.state == AuctionState.ONGOING:
+            raise AUCTION_ONGOING_EXCEPTION
+        elif auction.state == AuctionState.ENDED:
+            raise AUCTION_ENDED_EXCEPTION
+        elif auction.state == AuctionState.CANCLED:
+            raise AUCTION_CANCELED_EXCEPTION
+
     english = EnglishAuction()
     return english.start(db, db_obj=auction, starting_date=starting_date, ending_date=ending_date)
 
@@ -53,6 +77,15 @@ def end_auction(*, id: int,
     auction = auction_repo.get(db, id=id)
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION
+
+    if auction.state != AuctionState.ONGOING:
+        if auction.state == AuctionState.CREATED:
+            raise AUCTION_NOT_STARTED_EXCEPTION
+        elif auction.state == AuctionState.ENDED:
+            raise AUCTION_ENDED_EXCEPTION
+        elif auction.state == AuctionState.CANCLED:
+            raise AUCTION_CANCELED_EXCEPTION
+
     english = EnglishAuction()
     return english.end(db, db_obj=auction)
 
@@ -67,7 +100,12 @@ def bid_in_auction(*, id: int,
         raise AUCTION_NOT_FOUND_EXCEPTION
 
     if auction.state != AuctionState.ONGOING:
-        raise AUCTION_NOT_STARTED_EXCEPTION
+        if auction.state == AuctionState.CREATED:
+            raise AUCTION_NOT_STARTED_EXCEPTION
+        elif auction.state == AuctionState.ENDED:
+            raise AUCTION_ENDED_EXCEPTION
+        elif auction.state == AuctionState.CANCLED:
+            raise AUCTION_CANCELED_EXCEPTION
 
     english = EnglishAuction()
     return english.bid(db, db_obj=auction, amount=amount, bidder_id=current_user.id)
@@ -80,6 +118,15 @@ def buy_it_now(*, id: int,
     auction = auction_repo.get(db, id=id)
     if not auction:
         raise AUCTION_NOT_FOUND_EXCEPTION
+
+    if auction.state != AuctionState.ONGOING:
+        if auction.state == AuctionState.CREATED:
+            raise AUCTION_NOT_STARTED_EXCEPTION
+        elif auction.state == AuctionState.ENDED:
+            raise AUCTION_ENDED_EXCEPTION
+        elif auction.state == AuctionState.CANCLED:
+            raise AUCTION_CANCELED_EXCEPTION
+
     english = EnglishAuction()
     return english.buy_it_now(db, db_obj=auction, buyer_id=current_user.id)
 
