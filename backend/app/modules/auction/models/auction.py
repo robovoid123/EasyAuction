@@ -9,7 +9,7 @@ from .auction_state import AuctionState
 
 class Auction(Base):
     id = sa.Column(sa.Integer, primary_key=True, index=True)
-    starting_amount = sa.Column(sa.Float)
+    starting_amount = sa.Column(sa.Float, nullable=False)
     bid_cap = sa.Column(sa.Float)  # max amount bidder can bid
     reserve = sa.Column(sa.Float)  # final amount must be >= reserve
 
