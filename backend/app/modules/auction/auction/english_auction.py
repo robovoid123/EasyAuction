@@ -8,6 +8,8 @@ from app.modules.auction.schemas.bid import BidCreate
 from app.utils.schedule import sched
 from app.db.session import SessionLocal
 
+from app.modules.user.repositories import notification_repo
+
 INC_AMT = 1.25
 
 INVALID_BID_EXCEPTION = HTTPException(status_code=400,
@@ -119,6 +121,12 @@ class EnglishAuction:
                 db.commit()
                 db.refresh(db_obj)
                 auction_repo.change_state(db, db_obj=db_obj, state=AuctionState.ENDED)
+                notification_data = {
+                    'title': f'You have won the auction of {db_obj.product.name}',
+                    'sender_id': db_obj.owner_id,
+                    'reciever_id': db_obj.final_winner_id
+                }
+                notification_repo.create(db=db, obj_in=notification_data)
             else:
                 # when no one bid in the auction
                 auction_repo.change_state(db, db_obj=db_obj, state=AuctionState.CANCLED)
