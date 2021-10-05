@@ -6,30 +6,12 @@ import AccessAlarmIcon from '@material-ui/icons/NotificationsActiveSharp';
 
 const Nav = () => {
     const [UserDataMe, setUserDataMe] = useState()
-    const [notifications, setNotifications] = useState()
+    const [notifications, setNotifications] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const { token, userData } = useContext(UserContext)
 
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const requestUserMe = {
-                method: 'GET',
-                headers: {
-                    Authorization: "bearer " + token[0],
-                },
-                mode: 'cors',
-            }
-
-            const response = await fetch("/api/v1/users/me", requestUserMe)
-            const data = await response.json()
-
-            if (response.ok) {
-                setUserDataMe(data)
-                setIsLoading(false)
-            }
-
-        }
 
         const fetchNotification = async () => {
             const requestNotification = {
@@ -49,15 +31,37 @@ const Nav = () => {
             }
         }
 
-        fetchUser()
-        fetchNotification()
-    }, [userData[0]])
+        const fetchUser = async () => {
+            const requestUserMe = {
+                method: 'GET',
+                headers: {
+                    Authorization: "bearer " + token[0],
+                },
+                mode: 'cors',
+            }
 
-    
+            const response = await fetch("/api/v1/users/me", requestUserMe)
+            const data = await response.json()
+
+            if (response.ok) {
+                setUserDataMe(data)
+                await fetchNotification()
+                setIsLoading(false)
+            }
+
+        }
+
+
+        fetchUser()
+    }, [])
+
+
 
     const handleLogout = () => {
         token[1](null)
     }
+
+    const a = [1, 2, 3]
 
     return (
         <nav className="navbar navbar-expand-md navbar-light bg-light mb-4">
@@ -84,24 +88,21 @@ const Nav = () => {
                                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <AccessAlarmIcon />
                                                 <span class="badge rounded-pill badge-notification bg-danger">
-                                                    {!notifications ? <>a</> : <>0</>}
+                                                    {notifications ? <>{notifications.length}</> : <>0</>}
                                                 </span>
                                             </a>
                                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                {notifications ? notifications.map((notification) => {
-                                                    <li>
-                                                    <a href="biditemlist" className="nav-link text-muted">a{console.log(notification.title)}</a>
-                                                    </li>
-                                                }):
+                                                {console.log(notifications, !notifications)}
+                                                {notifications ? <>{notifications.map(notification => <li>{notification.title}</li>)}</> :
                                                     <li><a href="biditemlist" className="nav-link text-muted">No Notification</a></li>
-                                                } 
+                                                }
                                             </ul>
                                         </li>
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <img src={UserDataMe.profile_pic.url !== "" ? "http://localhost:8000" + UserDataMe.profile_pic.url : "https://dummyimage.com/300x200/000/fff"} alt="User Profile Pic Display" className="rounded-circle" height="30" width="30" loading="lazy" />
                                             </a>
-                                            
+
                                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                                 <li><a href="biditemlist" className="nav-link text-muted">BidItemList</a></li>
                                                 <li><a href="product" className="nav-link text-muted">AuctionManagement</a></li>
