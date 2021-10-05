@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DeleteAuction } from '../components/DeleteAuction'
+import { StartAuction } from '../components/StartAuction'
 import { UserContext } from '../context/UserContext'
 
 const Product = props => {
@@ -27,6 +28,7 @@ const Product = props => {
                     <div className="row g-0">
                         <div className="col-md-8">
                             <div className="card-body">
+                                <span className="badge rounded-pill bg-info text-light mb-2">{auction.state}</span>
                                 <h3 className="mt-0 font-weight-bold mb-2 card-title">{auction.product.name}</h3>
                                 <p className="font-italic text-muted mb-0 small card-text">{auction.product.description}</p>
                                 <h4 className="font-weight-bold my-2 card-text">{new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(auction.current_bid_amount)}</h4>
@@ -37,7 +39,10 @@ const Product = props => {
                                     }}>
                                         <button className="btn btn-info me-2 my-2 text-light">Update Product</button>
                                     </Link>
-                                    <DeleteAuction id={auction.id} />
+                                    <DeleteAuction id={auction.id}/>
+                                    {auction.state === 'ongoing' || auction.state === 'ended' ? <> </> : (
+                                        <StartAuction id={auction.id} />
+                                    )}
                                 </div>
                             </div>
                         </div>

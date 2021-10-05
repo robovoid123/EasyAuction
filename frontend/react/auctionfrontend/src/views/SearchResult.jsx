@@ -1,9 +1,10 @@
 import ProductIndiButton from "../components/ProductIndiButton"
-import React from "react"
+import React, { useState } from "react"
 
 const SearchResult = props => {
 
     const [auctions, setAuctions] = React.useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
     var searchKey = props.location.state
 
@@ -12,12 +13,14 @@ const SearchResult = props => {
             .then((response) => response.json())
             .then((json) => {
                 setAuctions(json)
+                setIsLoading(false)
             });
     }, [searchKey]);
 
     return (
         <div className="container mt-5">
             <h2>Your Search Results</h2>
+            {isLoading ? <div>Loading...</div> : (
             <div className="row g-4">
                 {auctions.map((auction) => (
                     <div className="col-12 col-md-4 col-lg-3" key={auction.id}>
@@ -33,7 +36,7 @@ const SearchResult = props => {
                         </div>
                     </div>
                 ))}
-            </div>
+            </div>)}
         </div>
     )
 }

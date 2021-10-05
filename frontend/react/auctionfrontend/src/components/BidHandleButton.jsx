@@ -6,6 +6,8 @@ export const BidHandleButton = ({id, bid}) => {
     const{token} = useContext(UserContext)
     const [errorMessage, setErrorMessage] = React.useState("")
 
+    console.log(typeof bid, bid)
+
     const submitBid = async () => {
         const requestOptions = {
             method: 'POST',
@@ -14,7 +16,7 @@ export const BidHandleButton = ({id, bid}) => {
                 Authorization: "bearer " + token[0],
             },
             body: JSON.stringify(
-                bid
+                parseFloat(bid)
             ),
             mode: 'cors',
         }

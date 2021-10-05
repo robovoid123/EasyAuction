@@ -17,15 +17,14 @@ const ItemPage = props => {
             });
     }, [id]);
 
-
-
     return (
         <div className="container mt-5">
             {isLoading ? <div>Loading...</div> : (<div className="row">
                 <div className="col-md-7">
                     <div className="row mb-5">
                         <div className="col-md-12">
-                            <img src="https://dummyimage.com/700x500/000/fff" className="img-fluid " alt="dummy" />
+                            <img src={(auction.product.images.length) >= 1 ? "http://localhost:8000" + auction.product.images[auction.product.images.length - 1].url : "https://dummyimage.com/300x200/000/fff"} alt="Product Display" className="img-fluid" />
+                            {/* <img src="https://dummyimage.com/700x500/000/fff" className="img-fluid " alt="dummy" /> */}
                         </div>
                     </div>
                     <div className="row">
@@ -44,7 +43,7 @@ const ItemPage = props => {
                     <div className="row my-2">
                         <div className="col-md-12">
                             <span className="monospaced">Bid Cap {new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(auction.bid_cap)}</span>
-                            <span className="monospaced">Time Remaining</span>
+                            {/* <span className="monospaced">Time Remaining</span> */}
                         </div>
                     </div>
                     <div className="row">
@@ -52,7 +51,7 @@ const ItemPage = props => {
                             <h2 className="mb-4">{new Intl.NumberFormat("en-GB", {style: "currency",currency: "USD",maximumFractionDigits: 2 }).format(auction.current_bid_amount)}</h2>
 
                             <label>YOUR MAXIMUM BID:</label>
-                            <input type="text" className="form-control mb-3 mt-2" placeholder="Enter price to bid" value={bid} onChange={(e) => setBid(e.target.value)} required />
+                            <input type="text" className="form-control mb-3 mt-2" placeholder="Enter price to bid" value={bid} onChange={(e) => setBid(e.target.value.replace(/\D/g,""))} required />
                             <BidHandleButton id={id} bid={bid} />
                         </div>
                     </div>
