@@ -9,7 +9,6 @@ const LiveAuction = () => {
         fetch("/api/v1/auctions/?skip=0&limit=100&states=ongoing&order_by=last_bid_at", { mode: 'cors' })
             .then((response) => response.json())
             .then((json) => {
-                console.log(json)
                 setAuctions(json)
             });
     }, []);
@@ -17,7 +16,7 @@ const LiveAuction = () => {
     return (
         <div className="container mt-5">
             <h2>Live Auctions</h2>
-            <div class="row g-4">
+            <div className="row g-4">
                 {auctions.map((auction) => {
                     if (auction.state === 'ongoing') {
                         return (

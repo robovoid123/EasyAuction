@@ -6,16 +6,16 @@ import { UserContext } from '../context/UserContext'
 
 const Product = props => {
     const [auctions, setAuctions] = useState([])
-    const {userData} = useContext(UserContext)
+    const { userData } = useContext(UserContext)
 
     // const userId = props.location.state
 
     useEffect(() => {
-        fetch(`/api/v1/auctions/users/${userData[0]}?skip=0&limit=100&states=ongoing%2Cended%2Ccreated&order_by=last_bid_at`, {mode: 'cors'})
-        .then((response) => response.json())
-        .then ((json) => {
-            setAuctions(json)
-        })
+        fetch(`/api/v1/auctions/users/${userData[0]}?skip=0&limit=100&states=ongoing%2Cended%2Ccreated&order_by=last_bid_at`, { mode: 'cors' })
+            .then((response) => response.json())
+            .then((json) => {
+                setAuctions(json)
+            })
     }, [userData])
 
 

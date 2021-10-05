@@ -5,10 +5,10 @@ const HomePage = () => {
     return (
         <div>
             <div className="container mt-2">
-                <img src="https://dummyimage.com/1320x600/000/fff" class="img-fluid" alt="banner" />
+                <img src="https://dummyimage.com/1320x600/000/fff" className="img-fluid" alt="banner" />
             </div>
-           <FeaturedList />
-           <LiveAuction /> 
+            <FeaturedList />
+            <LiveAuction />
         </div>
     )
 }

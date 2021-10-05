@@ -126,22 +126,22 @@ export const AuctionUpdate = props => {
                                     <h3 className="fw-normal mb-3 pb-3" style={{ letterSpacing: "1px" }}>Update Product</h3>
 
                                     <div className="form-outline mb-4">
-                                        <label for="updateProductName" class="form-label">Name</label>
+                                        <label for="updateProductName" className="form-label">Name</label>
                                         <input type="text" id="updateProductName" className="form-control form-control-lg" placeholder={auction.product.name} value={name} onChange={(e) => setName(e.target.value)} />
                                     </div>
 
                                     <div className="form-outline mb-4">
-                                        <label for="updateProductDescription" class="form-label">Description</label>
+                                        <label for="updateProductDescription" className="form-label">Description</label>
                                         <input type="text" id="updateProductDescription" className="form-control form-control-lg" placeholder={auction.product.description} value={description} onChange={(e) => setDescription(e.target.value)} />
                                     </div>
 
                                     <div className="form-outline mb-4">
-                                        <label for="updateStartingAmount" class="form-label">Starting Bid Amount</label>
+                                        <label for="updateStartingAmount" className="form-label">Starting Bid Amount</label>
                                         <input type="text" id="updateStartingAmount" className="form-control form-control-lg" placeholder={auction.starting_amount} value={startingAmount} onChange={(e) => setStartingAmount(e.target.value)} />
                                     </div>
 
                                     <div className="form-outline mb-4">
-                                        <label for="updateBidCap" class="form-label">Bid Cap</label>
+                                        <label for="updateBidCap" className="form-label">Bid Cap</label>
                                         <input type="text" id="updateBidCap" className="form-control form-control-lg" placeholder={auction.bid_cap} value={bidCap} onChange={(e) => setBidCap(e.target.value)} />
                                     </div>
 
@@ -151,7 +151,7 @@ export const AuctionUpdate = props => {
                                     </div>
 
                                     <div className="form-outline mb-4">
-                                        <label for="updateProductImage" class="form-label">Image</label>
+                                        <label for="updateProductImage" className="form-label">Image</label>
                                         <input type="file" id="updateProductImage" className="form-control form-control-lg" onChange={(e) => setImage(e.target.files[0])} />
                                     </div>
 

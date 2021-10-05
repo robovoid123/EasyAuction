@@ -7,7 +7,7 @@ const Login = props => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
-    const {token} = useContext(UserContext)
+    const { token } = useContext(UserContext)
 
     const submitLogin = async () => {
         const requestOptions = {
@@ -64,7 +64,7 @@ const Login = props => {
                                     <button className="btn btn-info btn-lg btn-block text-light" type="submit">Login</button>
                                 </div>
 
-                                <p className="small mb-5 pb-lg-2"><a class="text-muted" href="#!">Forgot password?</a></p>
+                                <p className="small mb-5 pb-lg-2"><a className="text-muted" href="#!">Forgot password?</a></p>
                                 <p>Don't have an account? <a href="signup" className="link-info">Register here</a></p>
                             </form>
                         </div>
