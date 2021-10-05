@@ -40,7 +40,9 @@ const Product = props => {
                                         <button className="btn btn-info me-2 my-2 text-light">Update Product</button>
                                     </Link>
                                     <DeleteAuction id={auction.id}/>
-                                    <StartAuction id={auction.id} />
+                                    {auction.state === 'ongoing' || auction.state === 'ended' ? <> </> : (
+                                        <StartAuction id={auction.id} />
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -25,11 +25,7 @@ const SearchResult = props => {
                 {auctions.map((auction) => (
                     <div className="col-12 col-md-4 col-lg-3" key={auction.id}>
                         <div className="card">
-<<<<<<< HEAD
-                            {/* <img src={(auction.product.images.length) >= 1 ? "http://localhost:8000" + auction.product.images[auction.product.images.length].url : "https://dummyimage.com/300x200/000/fff"} className="card-img-top" alt="Product" /> */}
-=======
                             <img src={(auction.product.images.length) >= 1 ? "http://localhost:8000" + auction.product.images[auction.product.images.length - 1].url : "https://dummyimage.com/300x200/000/fff"} className="card-img-top" alt="..." />
->>>>>>> db1353783e7a0a3fc0ddd3085d2d80081151c6de
                             <div className="card-body">
                                 <h5 className="card-title">{auction.product.name}</h5>
                                 <p className="card-text">{auction.product.description}</p>
