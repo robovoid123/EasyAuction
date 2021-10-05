@@ -15,8 +15,7 @@ class BidRepository(BaseRepository[Bid, BidCreate,
             self.model.bidder_id == bidder_id).group_by(self.model.auction_id)
         auctions = auctions.order_by(
             desc(bid_count)).offset(skip).limit(limit).all()
-        auctions = [(db.query(Auction).get(a.auction_id), {
-                     'bidder_bid_count': a.bidder_bid_count}) for a in auctions]
+        auctions = [db.query(Auction).get(a.auction_id) for a in auctions]
         return auctions
 
 
