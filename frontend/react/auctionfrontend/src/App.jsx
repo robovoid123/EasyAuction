@@ -9,6 +9,7 @@ import {AuctionUpdate} from './views/AuctionUpdate'
 import ItemPage from './views/ItemPage'
 import SearchResult from './views/SearchResult'
 import BidItemList from './views/BidItemList'
+import {UserUpdate} from './views/UserUpdate'
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="/productUpdate" exact component={AuctionUpdate} />
             <Route path="/biditemlist" exact component={BidItemList} />
             <Route path="/item" exact component={ItemPage} />
+            <Route path="/settings" exact component={UserUpdate} />
             <Route path="/searchResult" exact component={SearchResult} />
           </Switch>
       </div>
