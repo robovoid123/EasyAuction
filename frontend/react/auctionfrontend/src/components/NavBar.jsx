@@ -1,8 +1,9 @@
 import React, { useContext } from "react"
 import SearchNav from "./SearchNav"
 import { UserContext } from "../context/UserContext"
+import { Link } from "react-router-dom"
 
-const Nav = () => {
+const Nav = props => {
     const { token, } = useContext(UserContext)
 
     const handleLogout = () => {
@@ -17,14 +18,6 @@ const Nav = () => {
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li className="nav-item">
-                            <a className="nav-link" href="/">Home</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="about">About</a>
-                        </li>
-                    </ul>
                     <div className="navbar-nav">
                         <SearchNav />
                         {token[0] === 'null' || !token[0] ? (
@@ -34,8 +27,26 @@ const Nav = () => {
                             </>
                         ) : (
                             <>
-                                <a href="product" className="btn btn-info nav-link text-light ms-2">AuctionManagement</a>
-                                <button className="btn btn-info nav-link text-light mx-2" onClick={handleLogout}>Logout</button>
+                                <ul className="navbar-nav mb-2 mb-lg-0">
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <img src="https://mdbootstrap.com/img/new/avatars/2.jpg" class="rounded-circle" height="25" alt="" loading="lazy" />
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <li><a href="biditemlist" className="nav-link text-muted">BidItemList</a></li>
+                                            <li><a href="product" className="nav-link text-muted">AuctionManagement</a></li>
+                                            <li><a href="product" className="nav-link text-muted">Settings</a></li>
+                                            <li><hr class="dropdown-divider"/></li>
+                                            <li>
+                                                <Link to={{
+                                                    pathname: '/',
+                                                }}>
+                                                    <button className="btn text-muted" onClick={handleLogout}>Logout</button>
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
                             </>
                         )}
                     </div>
