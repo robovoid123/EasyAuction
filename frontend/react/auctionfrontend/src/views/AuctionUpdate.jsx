@@ -146,7 +146,7 @@ export const AuctionUpdate = props => {
                                     </div>
 
                                     <div className="form-outline mb-4">
-                                        <label for="updateReserve" class="form-label">Reserve</label>
+                                        <label for="updateReserve" className="form-label">Reserve</label>
                                         <input type="text" id="updateReserve" className="form-control form-control-lg" placeholder={auction.reserve} value={reserve} onChange={(e) => setReserve(e.target.value)} />
                                     </div>
 

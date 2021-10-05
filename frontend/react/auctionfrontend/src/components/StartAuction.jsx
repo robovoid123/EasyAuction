@@ -2,8 +2,8 @@ import React, { useContext, useState } from 'react'
 import { UserContext } from '../context/UserContext'
 import { ErrorMessage } from './ErrorMessage'
 
-export const StartAuction = ({id}) => {
-    const {token} = useContext(UserContext)
+export const StartAuction = ({ id }) => {
+    const { token } = useContext(UserContext)
     const [startingDate, setStartingDate] = useState()
     const [endingDate, setEndingDate] = useState()
     const [errorMessage, setErrorMessage] = useState("")
@@ -12,10 +12,10 @@ export const StartAuction = ({id}) => {
     const end = new Date(endingDate)
 
 
-    const startAuction = async ()=> {
+    const startAuction = async () => {
         const resquestOption = {
             method: 'PUT',
-            headers : {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: "bearer " + token[0],
             },
@@ -50,34 +50,34 @@ export const StartAuction = ({id}) => {
 
     return (
         <>
-            <button type="button" class="btn btn-info mx-2 my-2 text-light" data-bs-toggle="modal" data-bs-target="#staticBackdrop"> Start Auction </button>
+            <button type="button" className="btn btn-info mx-2 my-2 text-light" data-bs-toggle="modal" data-bs-target="#staticBackdrop"> Start Auction </button>
 
-            <div className="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                <div className="modal-header">
-                    <h5 className="modal-title" id="exampleModalLabel">Start Auction</h5>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form style={{ width: "23rem" }} onSubmit={handleSubmit}>
-                    <div className="modal-body">
-                            <div className="form-outline mb-4">
-                                <input type="date" className="form-control form-control-lg" placeholder="Starting Date" value={startingDate} onChange={(e) => setStartingDate(e.target.value)} />
+            <div className="modal fade" id="staticBackdrop" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="exampleModalLabel">Start Auction</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form style={{ width: "23rem" }} onSubmit={handleSubmit}>
+                            <div className="modal-body">
+                                <div className="form-outline mb-4">
+                                    <input type="date" className="form-control form-control-lg" placeholder="Starting Date" value={startingDate} onChange={(e) => setStartingDate(e.target.value)} />
+                                </div>
+
+                                <div className="form-outline mb-4">
+                                    <input type="date" className="form-control form-control-lg" placeholder="Ending Date" value={endingDate} onChange={(e) => setEndingDate(e.target.value)} />
+                                </div>
+
+                                <ErrorMessage message={errorMessage} />
                             </div>
-
-                            <div className="form-outline mb-4">
-                                <input type="date" className="form-control form-control-lg" placeholder="Ending Date" value={endingDate} onChange={(e) => setEndingDate(e.target.value)} />
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button className="btn btn-info mx-2 my-2 text-light" type="submit">Start Auction</button>
                             </div>
-
-                            <ErrorMessage message={errorMessage} />
+                        </form>
                     </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button className="btn btn-info mx-2 my-2 text-light" type="submit">Start Auction</button>
-                    </div>
-                </form>
                 </div>
-            </div>
             </div>
         </>
     )

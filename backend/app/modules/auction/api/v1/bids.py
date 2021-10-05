@@ -11,7 +11,7 @@ from app.modules.auction.repositories.bid import bid_repo
 router = APIRouter()
 
 
-@router.get("/{bidder_id}/auctions", response_model=List[Tuple[AuctionInDB, Dict]])
+@router.get("/{bidder_id}/auctions", response_model=List[AuctionInDB])
 def get_bidder_bid_auctions(*,
                             bidder_id: int,
                             skip: int = 0,

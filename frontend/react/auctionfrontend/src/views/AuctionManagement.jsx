@@ -31,7 +31,7 @@ const Product = props => {
                                 <span className="badge rounded-pill bg-info text-light mb-2">{auction.state}</span>
                                 <h3 className="mt-0 font-weight-bold mb-2 card-title">{auction.product.name}</h3>
                                 <p className="font-italic text-muted mb-0 small card-text">{auction.product.description}</p>
-                                <h4 className="font-weight-bold my-2 card-text">{new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(auction.current_bid_amount)}</h4>
+                                <h4 className="font-weight-bold my-2 card-text">{new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(auction.current_bid_amount ? auction.current_bid_amount : auction.starting_amount)}</h4>
                                 <div className="d-flex">
                                     <Link to={{
                                         pathname: 'productUpdate',

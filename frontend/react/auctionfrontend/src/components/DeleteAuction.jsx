@@ -1,10 +1,10 @@
-import React, {useContext, useState} from 'react'
+import React, { useContext, useState } from 'react'
 import { ErrorMessage } from "./ErrorMessage";
 import { UserContext } from "../context/UserContext";
 
-export const DeleteAuction = ({id}) => {
+export const DeleteAuction = ({ id }) => {
     const [errorMessage, setErrorMessage] = useState("")
-    const {token} = useContext(UserContext)
+    const { token } = useContext(UserContext)
 
     const submitDeleteAuction = async () => {
         const requestOptions = {
@@ -40,7 +40,7 @@ export const DeleteAuction = ({id}) => {
             }
             setErrorMessage(responseErrorMessage)
         } else {
-            window.location.reload(); 
+            window.location.reload();
         }
     }
 
@@ -70,6 +70,7 @@ export const DeleteAuction = ({id}) => {
                 </div>
                 </div>
             </div>
+
             </div>
 
         </>
