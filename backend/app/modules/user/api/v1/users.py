@@ -1,4 +1,3 @@
-from app.modules.user.repositories.user import UserRepository
 from typing import Any, List
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
