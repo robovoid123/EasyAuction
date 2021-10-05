@@ -52,7 +52,7 @@ export const DeleteAuction = ({id}) => {
     return (
         <>
             <ErrorMessage message={errorMessage} />
-            <button type="button" class="btn btn-info mx-2 my-2 text-light" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete Auction </button>
+            <button type="button" className="btn btn-info mx-2 my-2 text-light" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete Auction </button>
 
             <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div className="modal-dialog">
