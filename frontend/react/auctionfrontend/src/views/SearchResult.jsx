@@ -20,7 +20,7 @@ const SearchResult = props => {
     return (
         <div className="container mt-5">
             <h2>Your Search Results</h2>
-            {isLoading ? <div>Loading...</div> : (
+            {isLoading ? <div className="spinner-border text-info" role="status"></div>: (
             <div className="row g-4">
                 {auctions.map((auction) => (
                     <div className="col-12 col-md-4 col-lg-3" key={auction.id}>

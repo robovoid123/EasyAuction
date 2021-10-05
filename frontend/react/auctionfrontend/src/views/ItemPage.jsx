@@ -19,7 +19,7 @@ const ItemPage = props => {
 
     return (
         <div className="container mt-5">
-            {isLoading ? <div>Loading...</div> : (<div className="row">
+            {isLoading ? <div className="spinner-border text-info" role="status"></div>: (<div className="row">
                 <div className="col-md-7">
                     <div className="row mb-5">
                         <div className="col-md-12">
