@@ -5,16 +5,16 @@ import { UserContext } from '../context/UserContext'
 
 const Product = props => {
     const [auctions, setAuctions] = useState([])
-    const {userData} = useContext(UserContext)
+    const { userData } = useContext(UserContext)
 
     // const userId = props.location.state
 
     useEffect(() => {
-        fetch(`/api/v1/auctions/users/${userData[0]}?skip=0&limit=100&states=ongoing%2Cended%2Ccreated&order_by=last_bid_at`, {mode: 'cors'})
-        .then((response) => response.json())
-        .then ((json) => {
-            setAuctions(json)
-        })
+        fetch(`/api/v1/auctions/users/${userData[0]}?skip=0&limit=100&states=ongoing%2Cended%2Ccreated&order_by=last_bid_at`, { mode: 'cors' })
+            .then((response) => response.json())
+            .then((json) => {
+                setAuctions(json)
+            })
     }, [userData])
 
 
@@ -25,11 +25,11 @@ const Product = props => {
             {auctions.map((auction) => (
                 <div className="card mb-3" key={auction.product.id}>
                     <div className="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h3 class="mt-0 font-weight-bold mb-2 card-title">{auction.product.name}</h3>
-                                <p class="font-italic text-muted mb-0 small card-text">{auction.product.description}</p>
-                                <h4 class="font-weight-bold my-2 card-text">{new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(auction.current_bid_amount)}</h4>
+                        <div className="col-md-8">
+                            <div className="card-body">
+                                <h3 className="mt-0 font-weight-bold mb-2 card-title">{auction.product.name}</h3>
+                                <p className="font-italic text-muted mb-0 small card-text">{auction.product.description}</p>
+                                <h4 className="font-weight-bold my-2 card-text">{new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(auction.current_bid_amount)}</h4>
                                 <div className="d-flex">
                                     <Link to={{
                                         pathname: 'productUpdate',
@@ -37,7 +37,7 @@ const Product = props => {
                                     }}>
                                         <button className="btn btn-info me-2 my-2 text-light">Update Product</button>
                                     </Link>
-                                    <DeleteAuction id={auction.id}/>
+                                    <DeleteAuction id={auction.id} />
                                 </div>
                             </div>
                         </div>
