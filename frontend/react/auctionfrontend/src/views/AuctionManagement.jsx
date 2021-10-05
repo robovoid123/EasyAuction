@@ -46,8 +46,8 @@ const Product = props => {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-4 d-flex justify-content-center">
-                            <img src={(auction.product.images.length) >= 1 ? "http://localhost:8000" + auction.product.images[auction.product.images.length - 1].url : "https://dummyimage.com/300x200/000/fff"} alt="Product Display" width="400" className="img-fluid " />
+                        <div className="col-md-4 d-flex justify-content-center px-2 py-3">
+                            <img src={(auction.product.images.length) >= 1 ? "http://localhost:8000" + auction.product.images[auction.product.images.length - 1].url : "https://dummyimage.com/300x200/000/fff"} alt="Product Display" width="400" className="img-fluid" />
                         </div>
                     </div>
                 </div>
