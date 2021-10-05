@@ -26,7 +26,7 @@ const Product = props => {
             {auctions.map((auction) => (
                 <div className="card mb-3" key={auction.product.id}>
                     <div className="row g-0">
-                        <div className="col-md-8">
+                        <div className="col-md-8 d-flex align-items-center px-4">
                             <div className="card-body">
                                 <span className="badge rounded-pill bg-info text-light mb-2">{auction.state}</span>
                                 <h3 className="mt-0 font-weight-bold mb-2 card-title">{auction.product.name}</h3>
@@ -46,8 +46,8 @@ const Product = props => {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-4">
-                            <img src={(auction.product.images.length) >= 1 ? "http://localhost:8000" + auction.product.images[auction.product.images.length - 1].url : "https://dummyimage.com/300x200/000/fff"} alt="Product Display" width="400" className="ml-lg-5 order-1 order-lg-2 my-3" />
+                        <div className="col-md-4 d-flex justify-content-center">
+                            <img src={(auction.product.images.length) >= 1 ? "http://localhost:8000" + auction.product.images[auction.product.images.length - 1].url : "https://dummyimage.com/300x200/000/fff"} alt="Product Display" width="400" className="img-fluid " />
                         </div>
                     </div>
                 </div>
