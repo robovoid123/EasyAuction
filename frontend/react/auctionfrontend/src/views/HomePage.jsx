@@ -8,6 +8,9 @@ const HomePage = () => {
                 <img src="https://dummyimage.com/1320x600/000/fff" className="img-fluid" alt="banner" />
             </div>
             <FeaturedList />
+            <div className="container mt-4">
+                <hr />
+            </div>
             <LiveAuction />
         </div>
     )
