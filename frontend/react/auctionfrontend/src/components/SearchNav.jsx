@@ -6,13 +6,13 @@ const SearchNav = props => {
     const [search, setSearch] = useState("")
 
     return (
-        <form className="d-flex" id="FORM" autoComplete="off">
-            <input className="form-control" type="search" placeholder="Search" aria-label="Search" value={search} onChange={(e) => setSearch(e.target.value)}/>
+        <form className="d-flex align-items-center mx-4" id="FORM" autoComplete="off">
+            <input className="form-control me-1 py-2" type="search" placeholder="Search" aria-label="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
             <Link to={{
                 pathname: 'searchResult',
                 state: search,
             }}>
-                <button className="btn btn-outline-primary" type="submit"><SearchIcon/></button>
+                <button className="btn btn-outline-primary" type="submit"><SearchIcon /></button>
             </Link>
         </form>
     )

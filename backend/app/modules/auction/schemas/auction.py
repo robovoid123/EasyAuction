@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.modules.product.schemas.product import ProductInDB
 
@@ -13,7 +13,7 @@ class AuctionBase(BaseModel):
 
 class AuctionCreate(AuctionBase):
     product_id: int
-    starting_amount: float
+    starting_amount: float = Field(..., gt=0)
 
 
 class AuctionUpdate(AuctionBase):
