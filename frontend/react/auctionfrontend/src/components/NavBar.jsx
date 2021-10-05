@@ -3,7 +3,7 @@ import SearchNav from "./SearchNav"
 import { UserContext } from "../context/UserContext"
 
 const Nav = () => {
-    const {token, } = useContext(UserContext)
+    const { token, } = useContext(UserContext)
 
     const handleLogout = () => {
         token[1](null)
@@ -13,16 +13,16 @@ const Nav = () => {
         <nav className="navbar navbar-expand-md navbar-light bg-light">
             <div className="container">
                 <a href="/" className="navbar-brand">EasyAuction</a>
-                <button class="navbar-toggler mb-3 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <button className="navbar-toggler mb-3 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/">Home</a>
+                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li className="nav-item">
+                            <a className="nav-link" href="/">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="about">About</a>
+                        <li className="nav-item">
+                            <a className="nav-link" href="about">About</a>
                         </li>
                     </ul>
                     <div className="navbar-nav">
