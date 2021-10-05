@@ -6,7 +6,7 @@ const LiveAuction = () => {
     const [auctions, setAuctions] = React.useState([])
 
     React.useEffect(() => {
-        fetch("/api/v1/auctions/?skip=0&limit=100&states=ongoing&order_by=last_bid_at&desc=false", { mode: 'cors' })
+        fetch("/api/v1/auctions/?skip=0&limit=100&states=ongoing&order_by=last_bid_at", { mode: 'cors' })
             .then((response) => response.json())
             .then((json) => {
                 setAuctions(json)
