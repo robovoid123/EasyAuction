@@ -19,7 +19,7 @@ const FeaturedList = () => {
     return (
         <div className="container mt-5">
             <h2>List of item bid on</h2>
-            {isLoading ? <div>Loading..</div> : (
+            {isLoading ? <div className="spinner-border text-info" role="status"></div>: (
                 <div className="row g-4">
                     {auctions.map((auction) => {
                         return (

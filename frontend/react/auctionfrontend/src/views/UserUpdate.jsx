@@ -96,7 +96,7 @@ export const UserUpdate = () => {
     return (
         <section className="vh-90">
             <div className="container mt-4">
-                {isLoading ? <div>Loading..</div> : (
+                {isLoading ? <div className="spinner-border text-info" role="status"></div> : (
                     <div className="row">
                         <div className="col-sm-6 text-black">
                             <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">

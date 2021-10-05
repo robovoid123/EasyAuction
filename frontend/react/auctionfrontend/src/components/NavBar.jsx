@@ -1,30 +1,38 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import SearchNav from "./SearchNav"
 import { UserContext } from "../context/UserContext"
 import { Link } from "react-router-dom"
 
 const Nav = () => {
-    const [userData, setUserData] = useState()
+    const [UserDataMe, setUserDataMe] = useState()
     const [isLoading, setIsLoading] = useState(true)
-    const { token, } = useContext(UserContext)
+    const { token, userData } = useContext(UserContext)
 
-    const requestUserMe = {
-        method: 'GET',
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: "bearer " + token[0],
-        },
-        mode: 'cors',
-    }
 
-    React.useEffect(() => {
-        fetch(`/api/v1/users/me`, requestUserMe)
-            .then((response) => response.json())
-            .then((json) => {
-                setUserData(json)
+    useEffect(() => {
+        const fetchUser = async () => {
+            console.log(userData[0])
+            const requestUserMe = {
+                method: 'GET',
+                headers: {
+                    Authorization: "bearer " + token[0],
+                },
+                mode: 'cors',
+            }
+
+            const response = await fetch("/api/v1/users/me", requestUserMe)
+            const data = await response.json()
+
+            if (response.ok){
+                setUserDataMe(data)
                 setIsLoading(false)
-            });
-    }, []);
+            }
+            // if (token[0]){
+                // window.location.reload()
+            // }
+        }
+        fetchUser()
+    }, [userData[0]]) 
 
     const handleLogout = () => {
         token[1](null)
@@ -47,11 +55,12 @@ const Nav = () => {
                             </>
                         ) : (
                             <>
-                                {isLoading ? <div>Loading..</div> : (
+                                {isLoading ? <div className="spinner-border text-info" role="status"></div> : (
                                 <ul className="navbar-nav mb-2 mb-lg-0">
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <img src={userData.profile_pic.url ? "http://localhost:8000" + userData.profile_pic.url : "https://dummyimage.com/300x200/000/fff"} alt="User Profile Pic Display" className="rounded-circle" height="30" width="30" loading="lazy" />
+                                            {console.log(UserDataMe)}
+                                            <img src={UserDataMe.profile_pic.url !== "" ? "http://localhost:8000" + UserDataMe.profile_pic.url : "https://dummyimage.com/300x200/000/fff"} alt="User Profile Pic Display" className="rounded-circle" height="30" width="30" loading="lazy" />
                                             {/* <img src="https://mdbootstrap.com/img/new/avatars/2.jpg" class="rounded-circle" height="25" alt="" loading="lazy" /> */}
                                         </a>
                                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
