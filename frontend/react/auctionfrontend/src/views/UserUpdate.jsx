@@ -70,8 +70,7 @@ export const UserUpdate = () => {
                 body: imageData,
                 mode: 'cors',
             }
-
-            const responseImage = await fetch(`api/v1/users/me/profile_pics`, requestOptionsForImage)
+            const responseImage = await fetch(`/api/v1/users/me/profile-pic`, requestOptionsForImage)
             const imageResponse = await responseImage.json()
             // TODO: check if image response ok
         }
@@ -118,20 +117,16 @@ export const UserUpdate = () => {
                                         <label for="updateStartingAmount" className="form-label">Email</label>
                                         <input type="text" id="updateStartingAmount" className="form-control form-control-lg" placeholder={userData.email} value={email} onChange={(e) => setEmail(e.target.value)} />
                                     </div>
-                                    
+
                                     <div className="form-outline mb-4">
                                         <input type="file" className="form-control form-control-lg" onChange={(e) => setImage(e.target.files[0])} />
                                     </div>
 
                                     <ErrorMessage message={errorMessage} />
 
-                                    <Link to={{
-                                        pathname: '/',
-                                    }}>
-                                        <div className="pt-1 mt-3 mb-4">
-                                            <button className="btn btn-info btn-lg btn-block text-light" type="submit">Update Data</button>
-                                        </div>
-                                    </Link>
+                                    <div className="pt-1 mt-3 mb-4">
+                                        <button className="btn btn-info btn-lg btn-block text-light" type="submit">Update Data</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
