@@ -9,7 +9,6 @@ const FeaturedList = () => {
         fetch("/api/v1/auctions/?skip=0&limit=5&states=ongoing&order_by=bid_count", { mode: 'cors' })
             .then((response) => response.json())
             .then((json) => {
-                console.log(json)
                 setAuctions(json)
             });
     }, []);
