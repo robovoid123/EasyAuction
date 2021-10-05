@@ -16,7 +16,7 @@ export const BidHandleButton = ({id, bid}) => {
                 Authorization: "bearer " + token[0],
             },
             body: JSON.stringify(
-                bid
+                parseFloat(bid)
             ),
             mode: 'cors',
         }

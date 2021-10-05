@@ -119,50 +119,6 @@ export const AuctionUpdate = props => {
         <section className="vh-90">
             <div className="container mt-4">
                 {isLoading ? <div>Loading..</div> : (
-<<<<<<< HEAD
-                <div className="row">
-                    <div className="col-sm-6 text-black">
-                        <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
-                            <form style={{ width: "23rem" }} onSubmit={handleSubmit}>
-                                <h3 className="fw-normal mb-3 pb-3" style={{ letterSpacing: "1px" }}>Update Product</h3>
-
-                                <div className="form-outline mb-4">
-                                    <label for="exampleInputPassword1" class="form-label">Product Name</label>
-                                    <input type="text" className="form-control form-control-lg" placeholder={auction.product.name} value={name} onChange={(e) => setName(e.target.value)} />
-                                </div>
-
-                                <div className="form-outline mb-4">
-                                    <label for="exampleInputPassword1" class="form-label">Description</label>
-                                    <input type="text" className="form-control form-control-lg" placeholder={auction.product.description} value={description} onChange={(e) => setDescription(e.target.value)} />
-                                </div>
-
-                                <div className="form-outline mb-4">
-                                    <label for="exampleInputPassword1" class="form-label">Starting Amount</label>
-                                    <input type="text" className="form-control form-control-lg" placeholder={auction.starting_amount} value={startingAmount} onChange={(e) => setStartingAmount(e.target.value)} />
-                                </div>
-
-                                <div className="form-outline mb-4">
-                                    <label for="exampleInputPassword1" class="form-label">Bid Cap</label>
-                                    <input type="text" className="form-control form-control-lg" placeholder={auction.bid_cap} value={bidCap} onChange={(e) => setBidCap(e.target.value)} />
-                                </div>
-
-                                <div className="form-outline mb-4">
-                                    <label for="exampleInputPassword1" class="form-label">Reserve</label>
-                                    <input type="text" className="form-control form-control-lg" placeholder={auction.reserve} value={reserve} onChange={(e) => setReserve(e.target.value)} />
-                                </div>
-
-                                <div className="form-outline mb-4">
-                                    <label for="exampleInputPassword1" class="form-label">Add Image</label>
-                                    <input type="file" className="form-control form-control-lg" onChange={(e) => setImage(e.target.files[0])} />
-                                </div>
-
-                                <ErrorMessage message={errorMessage} />
-
-                                <div className="pt-1 mt-3 mb-4">
-                                    <button className="btn btn-info btn-lg btn-block text-light" type="submit">Update Product</button>
-                                </div>
-                            </form>
-=======
                     <div className="row">
                         <div className="col-sm-6 text-black">
                             <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
@@ -211,7 +167,6 @@ export const AuctionUpdate = props => {
                             <div className="container">
                                 <img src={(auction.product.images.length) >= 1 ? "http://localhost:8000" + auction.product.images[auction.product.images.length - 1].url : "https://dummyimage.com/300x200/000/fff"} alt="Product Display" className="img-fluid" />
                             </div>
->>>>>>> 475b0a7ecb405813d24cc976cca42c7c9b9c73f8
                         </div>
                     </div>)}
             </div>

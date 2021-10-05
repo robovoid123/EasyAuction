@@ -1,27 +1,46 @@
 import React, { useContext, useState } from 'react'
 import { UserContext } from '../context/UserContext'
+import { ErrorMessage } from './ErrorMessage'
 
 export const StartAuction = ({id}) => {
     const {token} = useContext(UserContext)
     const [startingDate, setStartingDate] = useState()
     const [endingDate, setEndingDate] = useState()
+    const [errorMessage, setErrorMessage] = useState("")
+
+    const start = new Date(startingDate)
+    const end = new Date(endingDate)
+
 
     const startAuction = async ()=> {
         const resquestOption = {
-            method: "POST",
+            method: 'PUT',
             headers : {
                 "Content-Type": "application/json",
-                Authorization: "bearer" + token[0],
+                Authorization: "bearer " + token[0],
             },
             body: JSON.stringify({
-                "starting_date": startingDate,
-                "ending_date": endingDate
+                "starting_date": start.toISOString(),
+                "ending_date": end.toISOString(),
             }),
             mode: 'cors'
         }
+        console.log(token[0])
 
         const response = await fetch(`/api/v1/auctions/${id}/start`, resquestOption)
         const data = await response.json()
+
+        if (!response.ok) {
+            let responseErrorMessage = data.detail
+            // if error message from backend is a string then only set ErrorMessage
+            // TODO: error message which are object need to be handled seperately
+            if (typeof (responseErrorMessage) !== 'string') {
+                responseErrorMessage = ''
+            }
+            setErrorMessage(responseErrorMessage)
+        } else {
+            window.location.reload()
+        }
     }
 
     const handleSubmit = (e) => {
@@ -50,7 +69,7 @@ export const StartAuction = ({id}) => {
                                 <input type="date" className="form-control form-control-lg" placeholder="Ending Date" value={endingDate} onChange={(e) => setEndingDate(e.target.value)} />
                             </div>
 
-                            {/* <ErrorMessage message={errorMessage} /> */}
+                            <ErrorMessage message={errorMessage} />
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>

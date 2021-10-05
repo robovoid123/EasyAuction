@@ -17,8 +17,6 @@ const ItemPage = props => {
             });
     }, [id]);
 
-
-
     return (
         <div className="container mt-5">
             {isLoading ? <div>Loading...</div> : (<div className="row">
