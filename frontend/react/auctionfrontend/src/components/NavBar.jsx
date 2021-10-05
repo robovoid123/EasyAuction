@@ -1,10 +1,30 @@
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 import SearchNav from "./SearchNav"
 import { UserContext } from "../context/UserContext"
 import { Link } from "react-router-dom"
 
-const Nav = props => {
+const Nav = () => {
+    const [userData, setUserData] = useState()
+    const [isLoading, setIsLoading] = useState(true)
     const { token, } = useContext(UserContext)
+
+    const requestUserMe = {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "bearer " + token[0],
+        },
+        mode: 'cors',
+    }
+
+    React.useEffect(() => {
+        fetch(`/api/v1/users/me`, requestUserMe)
+            .then((response) => response.json())
+            .then((json) => {
+                setUserData(json)
+                setIsLoading(false)
+            });
+    }, []);
 
     const handleLogout = () => {
         token[1](null)
@@ -27,15 +47,17 @@ const Nav = props => {
                             </>
                         ) : (
                             <>
+                                {isLoading ? <div>Loading..</div> : (
                                 <ul className="navbar-nav mb-2 mb-lg-0">
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <img src="https://mdbootstrap.com/img/new/avatars/2.jpg" class="rounded-circle" height="25" alt="" loading="lazy" />
+                                            <img src={userData.profile_pic.url ? "http://localhost:8000" + userData.profile_pic.url : "https://dummyimage.com/300x200/000/fff"} alt="User Profile Pic Display" className="rounded-circle" height="30" width="30" loading="lazy" />
+                                            {/* <img src="https://mdbootstrap.com/img/new/avatars/2.jpg" class="rounded-circle" height="25" alt="" loading="lazy" /> */}
                                         </a>
                                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                             <li><a href="biditemlist" className="nav-link text-muted">BidItemList</a></li>
                                             <li><a href="product" className="nav-link text-muted">AuctionManagement</a></li>
-                                            <li><a href="product" className="nav-link text-muted">Settings</a></li>
+                                            <li><a href="settings" className="nav-link text-muted">Settings</a></li>
                                             <li><hr class="dropdown-divider"/></li>
                                             <li>
                                                 <Link to={{
@@ -46,7 +68,7 @@ const Nav = props => {
                                             </li>
                                         </ul>
                                     </li>
-                                </ul>
+                                </ul>)}
                             </>
                         )}
                     </div>
