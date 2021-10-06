@@ -132,8 +132,7 @@ export const UserUpdate = () => {
                         </div>
                         <div className="col-sm-6 my-5">
                             <div className="container">
-                                {console.log(userData.profile_pic.url)}
-                                <img src={userData.profile_pic.url ? "http://localhost:8000" + userData.profile_pic.url : "https://dummyimage.com/300x200/000/fff"} alt="User Profile Pic Display" className="img-fluid" />
+                                <img src={'profile_pic' in userData && userData.profile_pic !== null ? "http://localhost:8000" + userData.profile_pic.url : "https://dummyimage.com/300x200/000/fff"} alt="User Profile Pic Display" className="img-fluid" />
                             </div>
                         </div>
                     </div>)}

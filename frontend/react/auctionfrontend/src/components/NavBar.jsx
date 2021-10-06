@@ -118,7 +118,7 @@ const Nav = () => {
                                         </li>
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <img src={UserDataMe.profile_pic.url !== "" ? "http://localhost:8000" + UserDataMe.profile_pic.url : "https://dummyimage.com/300x200/000/fff"} alt="User Profile Pic Display" className="rounded-circle" height="30" width="30" loading="lazy" />
+                                                <img src={'profile_pic' in UserDataMe && UserDataMe.profile_pic !== null ? "http://localhost:8000" + UserDataMe.profile_pic.url : "https://dummyimage.com/300x200/000/fff"} alt="User Profile Pic Display" className="rounded-circle" height="30" width="30" loading="lazy" />
                                             </a>
 
                                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
