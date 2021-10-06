@@ -12,7 +12,6 @@ const Nav = () => {
 
 
     useEffect(() => {
-
         const fetchNotification = async () => {
             const requestNotification = {
                 method: 'GET',
@@ -50,10 +49,24 @@ const Nav = () => {
             }
 
         }
-
-
         fetchUser()
     }, [])
+
+    function readNotification(id) {
+        const fetchUser = async () => {
+            const requestUserMe = {
+                method: 'POST',
+                headers: {
+                    Authorization: "bearer " + token[0],
+                },
+                mode: 'cors',
+            }
+
+            const responseRead = await fetch(`/api/v1/notification/read/${id}`, requestUserMe)
+            const dataRead = await responseRead.json()
+        }
+        fetchUser()
+    }
 
 
 
@@ -92,8 +105,13 @@ const Nav = () => {
                                                 </span>
                                             </a>
                                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                {console.log(notifications, !notifications)}
-                                                {notifications ? <>{notifications.map(notification => <li>{notification.title}</li>)}</> :
+                                                {notifications ? <>{notifications.map(notification => <li className="p-2">
+                                                    <Link to={{
+                                                        pathname: 'biditemlist',
+                                                    }}>
+                                                        <button className="btn" onClick={readNotification(notification.id)}>{notification.title}</button>
+                                                    </Link>
+                                                    <hr class="dropdown-divider" /></li>)}</> :
                                                     <li><a href="biditemlist" className="nav-link text-muted">No Notification</a></li>
                                                 }
                                             </ul>

@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import { ErrorMessage } from "../components/ErrorMessage";
+import imageSignup from "../assets/img/auctionBid.png"
 
 const Signup = props => {
     const [email, setEmail] = useState("")
@@ -61,7 +62,7 @@ const Signup = props => {
             <div className="container mt-4">
                 <div className="row">
                     <div className="col-sm-6 px-0 d-none d-sm-block">
-                        <img src="https://dummyimage.com/600x700/000/fff" alt="Auction Bid" className="w-100" style={{ objectFit: "cover", objectPosition: "left" }} />
+                        <img src={imageSignup} alt="Auction Bid" className="w-100" style={{ objectFit: "cover", objectPosition: "left" }} />
                     </div>
                     <div className="col-sm-6 text-black">
                         <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">

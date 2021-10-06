@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react"
 
 import { ErrorMessage } from '../components/ErrorMessage'
 import { UserContext } from '../context/UserContext'
+import imageLogin from '../assets/img/auctionPhone.png'
 
 const Login = props => {
     const [email, setEmail] = useState("")
@@ -70,7 +71,7 @@ const Login = props => {
                         </div>
                     </div>
                     <div className="col-sm-6 px-0 d-none d-sm-block">
-                        <img src="https://dummyimage.com/600x700/000/fff" alt="dummy" className="w-100" style={{ objectFit: "cover", objectPosition: "left" }} />
+                        <img src={imageLogin} alt="dummy" className="w-100" style={{ objectFit: "cover", objectPosition: "left" }} />
                     </div>
                 </div>
             </div>
