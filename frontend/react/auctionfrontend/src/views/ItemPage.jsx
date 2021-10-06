@@ -1,10 +1,12 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import { BidHandleButton } from '../components/BidHandleButton';
+import { UserContext } from "../context/UserContext";
 
 const ItemPage = props => {
     const [auction, setAuction] = React.useState([])
     const [bid, setBid] = React.useState("")
     const [isLoading, setIsLoading] = React.useState(true)
+    const { token } = useContext(UserContext)
 
     var id = props.location.state
 
@@ -16,6 +18,26 @@ const ItemPage = props => {
                 setIsLoading(false)
             });
     }, [id]);
+
+    const handleBidItNow = (id) =>{
+        console.log(id, "---------------");
+        const submitBitItNow = async () => {
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    Authorization: "bearer " + token[0],
+                },
+                mode: 'cors',
+            }
+            const response = await fetch(`/api/v1/auctions/${id}/buy_it_now`, requestOptions)
+            const data = await response.json()
+            
+            if (response.ok) {
+                window.location.reload()
+            }
+        }
+        submitBitItNow()
+    }
 
     return (
         <div className="container mt-5">
@@ -43,7 +65,7 @@ const ItemPage = props => {
                     <div className="row my-2">
                         <div className="col-md-12">
                             <span className="monospaced">Bid Cap {new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(auction.bid_cap)}</span>
-                            {/* <span className="monospaced">Time Remaining</span> */}
+                            <button className="btn btn-info text-light ms-4" onClick={() => handleBidItNow(auction.id)}>Bid It Now</button>
                         </div>
                     </div>
                     <div className="row">
